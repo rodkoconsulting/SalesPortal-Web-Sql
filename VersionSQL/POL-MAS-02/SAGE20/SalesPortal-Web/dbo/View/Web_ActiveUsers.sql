@@ -1,5 +1,5 @@
-﻿SET QUOTED_IDENTIFIER, ANSI_NULLS ON
-GO
+﻿/****** Object:  View [dbo].[Web_ActiveUsers]    Committed by VersionSQL https://www.versionsql.com ******/
+
 CREATE VIEW [dbo].[Web_ActiveUsers]
 AS
 SELECT DISTINCT UserName
@@ -10,4 +10,3 @@ SELECT DISTINCT UserName
 FROM         dbo.Users u LEFT OUTER JOIN
                       MAS_POL.dbo.AR_Salesperson s ON u.RepCode = s.SalespersonNo
 WHERE s.SalespersonDivisionNo IS NULL OR s.SalespersonDivisionNo = '00'
-GO
