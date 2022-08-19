@@ -1,5 +1,5 @@
-﻿/****** Object:  View [dbo].[ODataOrders]    Committed by VersionSQL https://www.versionsql.com ******/
-
+﻿SET QUOTED_IDENTIFIER, ANSI_NULLS ON
+GO
 CREATE VIEW [dbo].[ODataOrders]
 AS
 WITH PoAddress As
@@ -171,3 +171,4 @@ INNER JOIN MAS_POL.dbo.AR_Salesperson s ON o.Rep = s.SalespersonNo and o.RepDiv 
 INNER JOIN MAS_POL.dbo.CI_Item i ON o.ItemCode = i.ItemCode
 LEFT OUTER JOIN PoEta eta ON o.ItemCode = eta.ItemCode
 LEFT OUTER JOIN MAS_POL.dbo.AR_Customer c on o.ARDivisionNo = c.ARDivisionNo and o.CustomerNo = c.CustomerNo
+GO
