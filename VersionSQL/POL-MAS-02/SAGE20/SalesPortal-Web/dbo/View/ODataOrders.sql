@@ -97,7 +97,7 @@ SELECT     h.SalespersonNo as Rep
 		   ,h.InvoiceNo as OrderNo
 		   ,CASE WHEN Year(OrderDate) > 1900 THEN OrderDate ELSE InvoiceDate END AS OrderDate
 		   ,InvoiceDate as ShipDate
-		   ,'' AS ArrivalDate
+		   ,NULL AS ArrivalDate
 		   ,'I' as OrderType
 		   ,'' as HoldCode
 		   ,UDF_NJ_COOP as CoopNo
@@ -121,7 +121,7 @@ SELECT	   a.UDF_REP_CODE as Rep
 		   ,po.PurchaseOrderNo as OrderNo
 		   ,PurchaseOrderDate as OrderDate
 		   ,RequiredExpireDate as ShipDate
-		   ,'' AS ArrivalDate
+		   , NULL AS ArrivalDate
 		   ,'SM' as OrderType
 		   ,'SM' as HoldCode
 		   ,'' as CoopNo
