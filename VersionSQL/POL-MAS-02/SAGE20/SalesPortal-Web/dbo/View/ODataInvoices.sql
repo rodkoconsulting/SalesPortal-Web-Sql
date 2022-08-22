@@ -6,12 +6,12 @@ WITH InvHist AS
 (SELECT       h.InvoiceNo, h.HeaderSeqNo, InvoiceType, InvoiceDate, ARDivisionNo, CustomerNo, SalesPersonNo, Comment, UDF_NJ_COOP, ItemCode, ItemCodeDesc, QuantityShipped, UnitPrice, ExtensionAmt
 FROM            MAS_POL.dbo.AR_InvoiceHistoryHeader h INNER JOIN
 				MAS_POL.dbo.AR_InvoiceHistoryDetail d on h.InvoiceNo = d.InvoiceNo and h.HeaderSeqNo = d.HeaderSeqNo
-WHERE ModuleCode = 'S/O' and InvoiceDate >= DATEADD(YEAR, - 2, GETDATE()) and ItemCode != '/C'
+WHERE ModuleCode = 'S/O' and InvoiceDate >= DATEADD(YEAR, - 2, GETDATE()) and ItemCode NOT IN ('/C','/COBRA')
 UNION ALL
 SELECT        h.InvoiceNo, h.InvoiceNo, InvoiceType, ShipDate, ARDivisionNo, CustomerNo, SalesPersonNo, Comment, UDF_NJ_COOP, ItemCode, ItemCodeDesc, QuantityShipped, UnitPrice, ExtensionAmt
 FROM            MAS_POL.dbo.SO_InvoiceHeader h INNER JOIN
 				MAS_POL.dbo.SO_InvoiceDetail d on h.InvoiceNo = d.InvoiceNo
-WHERE ItemCode != '/C'
+WHERE ItemCode NOT IN ('/C','/COBRA')
 )
 Select 
 h.InvoiceNo as 'InvNo'
