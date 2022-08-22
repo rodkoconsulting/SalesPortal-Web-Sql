@@ -26,7 +26,7 @@ h.InvoiceNo as 'InvNo'
 , h.UnitPrice AS Pri
 , h.ExtensionAmt AS Tot
 , h.Comment as Cmt
-, h.UDF_NJ_COOP AS Coop
+, CASE WHEN UDF_TERRITORY = 'NJ' THEN h.UDF_NJ_COOP ELSE '' END AS Coop
 , c.SalespersonNo AS AcctR
 , h.SalespersonNo AS InvR
 , i.UDF_WINE_COLOR AS ITyp
