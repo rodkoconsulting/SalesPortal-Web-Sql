@@ -1,0 +1,11 @@
+version: "3"
+services:
+  sqlsrv:
+    image: tobiasfenster/mssql-server-dev-unsupported:2019-latest
+    environment:
+      ACCEPT_EULA: "Y"
+      SA_PASSWORD: "TestP@ssw0rd"
+    ports:
+      - "14330:1433"
+    volumes:
+      - ./files:c:\data:ro
