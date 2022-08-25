@@ -19,6 +19,7 @@ SELECT
       ,[Coop]
       ,[InvR]
       ,[Desc]
+	  ,[ItemCode]
       ,[Qty]
       ,[Pri]
       ,[Tot]
