@@ -23,6 +23,7 @@ SELECT
 	, h.SalespersonNo AS InvR
 	, c.SalespersonNo AS AcctR
 	, CASE WHEN i.UDF_BRAND_NAMES = '' THEN h.ItemCodeDesc ELSE '' END AS 'Desc'
+	, h.ItemCode
 	, CAST(ROUND(QuantityShipped,2) AS FLOAT) AS Qty
 	, CAST(ROUND(UnitPrice,2) AS FLOAT) AS Pri
 	, CAST(ROUND(ExtensionAmt,2) AS FLOAT) AS Tot
