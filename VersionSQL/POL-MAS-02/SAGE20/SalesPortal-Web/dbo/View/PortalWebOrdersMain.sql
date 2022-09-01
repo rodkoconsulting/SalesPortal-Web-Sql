@@ -142,12 +142,14 @@ SELECT
 				 WHEN UDF_TERRITORY = 'PA' then 'PA'
 				 ELSE 'MAN'
 				 END AS Ter
+	,o.Invoiced as Inv
 	,o.ItemCode as Item
-	,o.ItemCodeDesc as [Desc]
+	, CASE WHEN i.UDF_BRAND_NAMES = '' THEN o.ItemCodeDesc ELSE '' END AS 'Desc'
 	, CAST(ROUND(Quantity,2) AS FLOAT) AS Qty
 	, CAST(ROUND(Price,2) AS FLOAT) AS Pri
 	, CAST(ROUND(Total,2) AS FLOAT) AS Tot
 	, LineComment as ItmCmt
 FROM ORDERS o
 INNER JOIN MAS_POL.dbo.AR_Salesperson s ON o.Rep = s.SalespersonNo and o.RepDiv = s.SalespersonDivisionNo
+INNER JOIN MAS_POL.dbo.CI_Item AS i ON i.ItemCode = o.ItemCode
 WHERE o.ItemCode NOT IN ('/COBRA')
