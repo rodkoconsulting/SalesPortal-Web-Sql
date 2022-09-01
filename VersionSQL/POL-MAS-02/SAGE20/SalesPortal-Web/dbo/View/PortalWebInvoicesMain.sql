@@ -17,7 +17,7 @@ SELECT
 	h.InvoiceNo as 'InvNo'
 	, CASE WHEN h.InvoiceType = 'CM' THEN 'C' ELSE 'I' END AS Typ
 	, h.ARDivisionNo + h.CustomerNo AS AcctNo
-	, CONVERT(varchar,h.InvoiceDate,12) as Date
+	, CONVERT(varchar,h.InvoiceDate,23) as Date
 	, h.Comment as Cmt
 	, CASE WHEN UDF_TERRITORY = 'NJ' THEN h.UDF_NJ_COOP ELSE '' END AS Coop
 	, h.SalespersonNo AS InvR
