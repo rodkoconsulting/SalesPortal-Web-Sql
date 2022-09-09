@@ -23,6 +23,7 @@ SELECT
       ,[Coop]
 	  ,[Inv]
       ,[Ter]
+	  ,[Rep]
 	  ,[Item]
 	  ,[Desc]
       ,[Qty]
