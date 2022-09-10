@@ -33,7 +33,7 @@ h.[InvNo]
       ,[Coop]
       ,[InvR]
 	  , [Desc]
-	, ItemCode
+	, ItemCode as Item
 	, Qty
 	, Pri
 	, Tot
@@ -44,7 +44,7 @@ order by invno
 FOR JSON AUTO
 ),
 Item = (
-SELECT DISTINCT [ItemCode]
+SELECT DISTINCT [ItemCode] as Code
       ,[Desc]
       ,[ITyp]
       ,[Vari]
