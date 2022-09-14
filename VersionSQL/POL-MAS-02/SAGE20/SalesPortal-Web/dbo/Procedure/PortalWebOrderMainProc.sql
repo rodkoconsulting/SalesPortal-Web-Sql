@@ -30,6 +30,7 @@ SELECT
       ,[Pri]
       ,[Tot]
 	  ,ItmCmt
+	  ,BoEta
   FROM [dbo].[PortalWebOrdersMain]
                   
 where ((@AccountType = 'REP' and (Rep = @RepCode)) or (@AccountType = 'OFF') )

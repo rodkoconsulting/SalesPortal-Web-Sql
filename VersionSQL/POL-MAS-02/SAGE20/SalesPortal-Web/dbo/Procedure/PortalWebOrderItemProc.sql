@@ -11,7 +11,6 @@ BEGIN
 SELECT @RepCode = RepCode FROM Web_ActiveUsers where UserName=@UserName
 SELECT @AccountType = AccountType FROM Web_ActiveUsers where UserName=@UserName   
 SELECT DISTINCT [Code]
-	  ,[BoEta]
       ,[Desc]
   FROM [dbo].[PortalWebOrdersItem]
                   
