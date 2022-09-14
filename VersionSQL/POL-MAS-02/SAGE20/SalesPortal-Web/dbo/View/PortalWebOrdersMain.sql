@@ -18,6 +18,13 @@ WITH Po AS
 			INNER JOIN MAS_POL.dbo.PO_PurchaseOrderDetail d ON h.PurchaseOrderNo = d.PurchaseOrderNo
 		    WHERE h.OrderStatus NOT in ('X') and h.OrderType in ('S','X') and h.WarehouseCode = '000' AND (d.QuantityOrdered - d.QuantityReceived > 0)
 ),
+PoEta AS
+(
+	SELECT ItemCode, Min(RequiredExpireDate) As RequiredDate
+	FROM Po
+	WHERE OrderType = 'S' and RequiredExpireDate != '1/1/1753'
+	GROUP BY ItemCode
+),
 ORDERS AS
 ( 
 SELECT     h.SalespersonNo as Rep
@@ -149,7 +156,9 @@ SELECT
 	, CAST(ROUND(Price,2) AS FLOAT) AS Pri
 	, CAST(ROUND(Total,2) AS FLOAT) AS Tot
 	, LineComment as ItmCmt
+	, CASE WHEN o.HoldCode = 'BO' and NOT eta.RequiredDate IS NULL then CONVERT(varchar,eta.RequiredDate,23) ELSE '' END AS BoEta
 FROM ORDERS o
 INNER JOIN MAS_POL.dbo.AR_Salesperson s ON o.Rep = s.SalespersonNo and o.RepDiv = s.SalespersonDivisionNo
 INNER JOIN MAS_POL.dbo.CI_Item AS i ON i.ItemCode = o.ItemCode
+LEFT OUTER JOIN PoEta eta ON i.ItemCode = eta.ItemCode
 WHERE o.ItemCode NOT IN ('/COBRA')
