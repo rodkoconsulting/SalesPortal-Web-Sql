@@ -17,8 +17,7 @@ SELECT DISTINCT
 	, h.SalespersonNo AS InvR
 	, c.SalespersonNo AS AcctR
 	, CASE WHEN SUBSTRING(c.CUSTOMERTYPE, 3, 2) = 'ON' THEN 'On' ELSE 'Off' END AS Prem
-	, CASE WHEN s.UDF_TERRITORY = 'NY Metro' THEN 'NYM' WHEN UDF_TERRITORY = 'NY Long Island' THEN 'NYLI' WHEN UDF_TERRITORY = 'NY Upstate' THEN 'NYU' WHEN UDF_TERRITORY = 'NY Westchester / Hudson' THEN
-                          'NYW' WHEN UDF_TERRITORY = 'NJ' THEN 'NJ' WHEN UDF_TERRITORY = 'Pennsylvania' THEN 'PA' ELSE 'Manager' END AS Ter
+	, s.UDF_TERRITORY AS Ter
 FROM InvHist h INNER JOIN
 	MAS_POL.dbo.AR_Customer AS c ON h.ARDivisionNo = c.ARDivisionNo AND h.CustomerNo = c.CustomerNo INNER JOIN
     MAS_POL.dbo.SO_ShipToAddress AS a ON c.ARDivisionNo = a.ARDivisionNo AND c.CustomerNo = a.CustomerNo AND c.PrimaryShipToCode = a.ShipToCode INNER JOIN
