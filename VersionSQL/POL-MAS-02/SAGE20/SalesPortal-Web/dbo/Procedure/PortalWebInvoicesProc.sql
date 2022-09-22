@@ -10,7 +10,7 @@ BEGIN
 	DECLARE @AccountType char(3);
 SELECT @RepCode = RepCode FROM Web_ActiveUsers where UserName=@UserName
 SELECT @AccountType = AccountType FROM Web_ActiveUsers where UserName=@UserName   
-SELECT Acct = (SELECT [AcctNo]
+SELECT Acct = (SELECT DISTINCT [AcctNo]
       ,[Acct]
       ,[Aff]
       ,[AcctR]

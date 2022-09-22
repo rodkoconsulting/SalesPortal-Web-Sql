@@ -1,6 +1,6 @@
 ﻿/****** Object:  View [dbo].[PortalWebOrdersMain]    Committed by VersionSQL https://www.versionsql.com ******/
 
-CREATE VIEW [dbo].[PortalWebOrdersMain]
+CREATE VIEW [dbo].[PortalWebOrdersMain-new]
 AS
 WITH Po AS
 (
@@ -18,13 +18,6 @@ WITH Po AS
 			INNER JOIN MAS_POL.dbo.PO_PurchaseOrderDetail d ON h.PurchaseOrderNo = d.PurchaseOrderNo
 		    WHERE h.OrderStatus NOT in ('X') and h.OrderType in ('S','X') and h.WarehouseCode = '000' AND (d.QuantityOrdered - d.QuantityReceived > 0)
 ),
-PoEta AS
-(
-	SELECT ItemCode, Min(RequiredExpireDate) As RequiredDate
-	FROM Po
-	WHERE OrderType = 'S' and RequiredExpireDate != '1/1/1753'
-	GROUP BY ItemCode
-),
 ORDERS AS
 ( 
 SELECT     h.SalespersonNo as Rep
@@ -34,6 +27,7 @@ SELECT     h.SalespersonNo as Rep
 		   ,h.InvoiceNo as OrderNo
 		   ,CASE WHEN YEAR(OrderDate)<2000 THEN ShipDate ELSE OrderDate END as OrderDate
 		   ,ShipDate
+
 		   ,'' AS ArrivalDate
 		   ,CASE WHEN Comment LIKE '%BILL & HOLD INVOICE%' THEN 'BHI'
 				WHEN Comment LIKE '%BILL & HOLD%' AND d.ExtensionAmt > 0 and OrderType = '1' THEN 'BHI'
@@ -41,16 +35,11 @@ SELECT     h.SalespersonNo as Rep
 				WHEN d.ExtensionAmt = 0 THEN 'BHS'
 				ELSE 'I'
 		   END as OrderType
-		   ,'' as HoldCode
+		   ,'' AS HoldCode
 		   ,left(UDF_NJ_COOP,10) as CoopNo
 		   ,Comment
 		   ,'Y' AS Invoiced
-		   ,ItemCode
-		   ,d.ItemCodeDesc
-		   ,QuantityOrdered as Quantity
-		   ,UnitPrice as Price
-		   ,ExtensionAmt as Total
-		   ,d.CommentText as LineComment
+		   , d.ItemCode
 FROM         MAS_POL.dbo.SO_InvoiceHeader h INNER JOIN MAS_POL.dbo.SO_InvoiceDetail d
 				ON h.InvoiceNo = d.InvoiceNo
 UNION ALL
@@ -72,12 +61,7 @@ SELECT     h.SalespersonNo as Rep
 		   ,UDF_NJ_COOP as CoopNo
 		   ,Comment
 		   ,'' AS Invoiced
-		   ,ItemCode
-		   ,d.ItemCodeDesc
-		   ,QuantityOrdered as Quantity
-		   ,UnitPrice as Price
-		   ,ExtensionAmt as Total
-		   ,CommentText as LineComment
+		   , d.ItemCode
 FROM         MAS_POL.dbo.SO_SalesOrderHeader h INNER JOIN
                        MAS_POL.dbo.SO_SalesOrderDetail d ON h.SalesOrderNo = d.SalesOrderNo
 WHERE    CurrentInvoiceNo = '' AND (ROUND(QuantityOrdered,2) > 0 or ROUND(ExtensionAmt,2) > 0)
@@ -95,12 +79,7 @@ SELECT     h.SalespersonNo as Rep
 		   ,UDF_NJ_COOP as CoopNo
 		   ,Comment
 		   ,'Y' AS Invoiced
-		   ,ItemCode
-		   ,d.ItemCodeDesc
-		   ,QuantityShipped as Quantity
-		   ,UnitPrice as Price
-		   ,ExtensionAmt as Total
-		   ,CommentText as LineComment
+		   , d.ItemCode
 FROM         MAS_POL.dbo.AR_InvoiceHistoryHeader h INNER JOIN
                        MAS_POL.dbo.AR_InvoiceHistoryDetail d ON h.InvoiceNo = d.InvoiceNo and
 					   h.HeaderSeqNo = d.HeaderSeqNo
@@ -119,12 +98,7 @@ SELECT	   a.UDF_REP_CODE as Rep
 		   ,'' as CoopNo
 		   ,Comment
 		   ,'' AS Invoiced
-		   ,ItemCode
-		   ,ItemCodeDesc
-		   ,QuantityOrdered as Quantity
-		   ,0.0 as Price
-		   ,0.0 as Total
-		   ,CommentText as LineComment
+		   , ItemCode
 FROM po
 	INNER JOIN MAS_POL.dbo.PO_ShipToAddress a ON po.ShipToCode = a.ShipToCode
 	WHERE po.OrderType = 'X' AND po.RequiredExpireDate > GETDATE()
@@ -141,24 +115,8 @@ SELECT
 	,CASE WHEN ArrivalDate !='' THEN CONVERT(varchar,ArrivalDate,23) ELSE '' END as ArrDate
 	,o.Comment as Cmt
 	,CoopNo as Coop
-	,CASE WHEN UDF_TERRITORY = 'NY Metro' then 'NYM'
-				 WHEN UDF_TERRITORY = 'NY Long Island' then 'NYL'
-				 WHEN UDF_TERRITORY = 'NY Upstate' then 'NYU'
-				 WHEN UDF_TERRITORY = 'NY Westchester / Hudson' then 'NYW'
-				 WHEN UDF_TERRITORY = 'NJ' then 'NJ'
-				 WHEN UDF_TERRITORY = 'PA' then 'PA'
-				 ELSE 'MAN'
-				 END AS Ter
+	,UDF_TERRITORY AS Ter
 	,o.Invoiced as Inv
-	,o.ItemCode as Item
-	, CASE WHEN i.UDF_BRAND_NAMES = '' THEN o.ItemCodeDesc ELSE '' END AS 'Desc'
-	, CAST(ROUND(Quantity,2) AS FLOAT) AS Qty
-	, CAST(ROUND(Price,2) AS FLOAT) AS Pri
-	, CAST(ROUND(Total,2) AS FLOAT) AS Tot
-	, LineComment as ItmCmt
-	, CASE WHEN o.HoldCode = 'BO' and NOT eta.RequiredDate IS NULL then CONVERT(varchar,eta.RequiredDate,23) ELSE '' END AS BoEta
-FROM ORDERS o
+	FROM ORDERS o
 INNER JOIN MAS_POL.dbo.AR_Salesperson s ON o.Rep = s.SalespersonNo and o.RepDiv = s.SalespersonDivisionNo
-INNER JOIN MAS_POL.dbo.CI_Item AS i ON i.ItemCode = o.ItemCode
-LEFT OUTER JOIN PoEta eta ON i.ItemCode = eta.ItemCode
 WHERE o.ItemCode NOT IN ('/COBRA')

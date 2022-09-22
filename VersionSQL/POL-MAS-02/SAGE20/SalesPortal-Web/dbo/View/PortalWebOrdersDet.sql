@@ -18,10 +18,18 @@ WITH Po AS
 			INNER JOIN MAS_POL.dbo.PO_PurchaseOrderDetail d ON h.PurchaseOrderNo = d.PurchaseOrderNo
 		    WHERE h.OrderStatus NOT in ('X') and h.OrderType in ('S','X') and h.WarehouseCode = '000' AND (d.QuantityOrdered - d.QuantityReceived > 0)
 ),
+PoEta AS
+(
+	SELECT ItemCode, Min(RequiredExpireDate) As RequiredDate
+	FROM Po
+	WHERE OrderType = 'S' and RequiredExpireDate != '1/1/1753'
+	GROUP BY ItemCode
+),
 ORDERS AS
 ( 
 SELECT     DISTINCT 
-		   h.SalespersonNo as Rep
+		   h.InvoiceNo as OrderNo
+		   ,'' as HoldCode
 		   ,ItemCode
 		   ,d.ItemCodeDesc
 		   ,QuantityOrdered as Quantity
@@ -32,7 +40,8 @@ FROM         MAS_POL.dbo.SO_InvoiceHeader h INNER JOIN MAS_POL.dbo.SO_InvoiceDet
 				ON h.InvoiceNo = d.InvoiceNo
 UNION ALL
 SELECT     DISTINCT 
-		   h.SalespersonNo as Rep
+		   h.SalesOrderNo as OrderNo
+		   ,CancelReasonCode as HoldCode
 		   ,ItemCode
 		   ,d.ItemCodeDesc
 		   ,QuantityOrdered as Quantity
@@ -44,7 +53,8 @@ FROM         MAS_POL.dbo.SO_SalesOrderHeader h INNER JOIN
 WHERE    CurrentInvoiceNo = '' AND (ROUND(QuantityOrdered,2) > 0 or ROUND(ExtensionAmt,2) > 0)
 UNION ALL
 SELECT     DISTINCT 
-		   h.SalespersonNo as Rep
+		   h.InvoiceNo as OrderNo
+		   ,'' as HoldCode
 		   ,ItemCode
 		   ,d.ItemCodeDesc
 		   ,QuantityShipped as Quantity
@@ -57,7 +67,8 @@ FROM         MAS_POL.dbo.AR_InvoiceHistoryHeader h INNER JOIN
 WHERE    InvoiceDate > GETDATE() and InvoiceDate < DateAdd(YEAR, 1, GETDATE())
 UNION ALL
 SELECT	   DISTINCT
-	       a.UDF_REP_CODE as Rep
+	       po.PurchaseOrderNo as OrderNo
+		   ,'' as HoldCode
 		   ,ItemCode
 		   ,ItemCodeDesc
 		   ,QuantityOrdered as Quantity
@@ -69,13 +80,15 @@ FROM po
 	WHERE po.OrderType = 'X' AND po.RequiredExpireDate > GETDATE()
 )
 SELECT DISTINCT
-	Rep
+	OrderNo as OrdNo
 	,o.ItemCode as Item
 	, CASE WHEN i.UDF_BRAND_NAMES = '' THEN o.ItemCodeDesc ELSE '' END AS 'Desc'
-	, CAST(ROUND(Quantity,2) AS FLOAT) AS Qty
-	, CAST(ROUND(Price,2) AS FLOAT) AS Pri
-	, CAST(ROUND(Total,2) AS FLOAT) AS Tot
+	, CONVERT(DECIMAL(9,2),(ROUND(Quantity,2))) AS Qty
+	, CONVERT(DECIMAL(9,2),(ROUND(Price,2))) AS Pri
+	, CONVERT(DECIMAL(9,2),(ROUND(Total,2))) AS Tot
 	, LineComment as ItmCmt
+	, CASE WHEN o.HoldCode = 'BO' and NOT eta.RequiredDate IS NULL then CONVERT(varchar,eta.RequiredDate,23) ELSE '' END AS BoEta
 FROM ORDERS o
 INNER JOIN MAS_POL.dbo.CI_Item AS i ON i.ItemCode = o.ItemCode
+LEFT OUTER JOIN PoEta eta ON i.ItemCode = eta.ItemCode
 WHERE o.ItemCode NOT IN ('/COBRA')
