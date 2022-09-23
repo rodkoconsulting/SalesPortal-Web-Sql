@@ -14,6 +14,8 @@ WITH Po AS
 			,d.ItemCodeDesc
 			,d.QuantityOrdered
 			,d.CommentText
+			,h.UDF_AVAILABLE_COMMENT
+			,h.WarehouseCode
 	FROM MAS_POL.dbo.PO_PurchaseOrderHeader h
 			INNER JOIN MAS_POL.dbo.PO_PurchaseOrderDetail d ON h.PurchaseOrderNo = d.PurchaseOrderNo
 		    WHERE h.OrderStatus NOT in ('X') and h.OrderType in ('S','X') and h.WarehouseCode = '000' AND (d.QuantityOrdered - d.QuantityReceived > 0)
@@ -24,6 +26,19 @@ PoEta AS
 	FROM Po
 	WHERE OrderType = 'S' and RequiredExpireDate != '1/1/1753'
 	GROUP BY ItemCode
+),
+Comment AS
+(
+SELECT ROW_NUMBER() OVER (PARTITION BY ItemCode ORDER BY ItemCode, PurchaseOrderDate) AS 'RN',
+ItemCode, UDF_AVAILABLE_COMMENT
+FROM         Po
+WHERE     UDF_AVAILABLE_COMMENT != '' and OrderType='S'and WarehouseCode='000'
+),
+AvailableComment AS
+(
+SELECT     ItemCode, UDF_AVAILABLE_COMMENT
+FROM Comment
+WHERE RN = 1
 ),
 ORDERS AS
 ( 
@@ -88,7 +103,9 @@ SELECT DISTINCT
 	, CONVERT(DECIMAL(9,2),(ROUND(Total,2))) AS Tot
 	, LineComment as ItmCmt
 	, CASE WHEN o.HoldCode = 'BO' and NOT eta.RequiredDate IS NULL then CONVERT(varchar,eta.RequiredDate,23) ELSE '' END AS BoEta
+	, IsNull(CASE WHEN o.HoldCode = 'BO' and eta.RequiredDate is null THEN ac.UDF_AVAILABLE_COMMENT ELSE NULL END,'') AS AvailCmt
 FROM ORDERS o
 INNER JOIN MAS_POL.dbo.CI_Item AS i ON i.ItemCode = o.ItemCode
 LEFT OUTER JOIN PoEta eta ON i.ItemCode = eta.ItemCode
+LEFT OUTER JOIN AvailableComment ac On i.ItemCode = ac.ItemCode
 WHERE o.ItemCode NOT IN ('/COBRA')

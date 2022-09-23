@@ -31,6 +31,7 @@ SELECT Main = (SELECT
       ,[Tot]
 	  ,ItmCmt
 	  ,BoEta
+	  ,AvailCmt
   FROM [dbo].[PortalWebOrdersMain] h INNER JOIN
   [dbo].[PortalWebOrdersDet] Det on h.OrdNo = Det.OrdNo
 where ((@AccountType = 'REP' and h.Rep = @RepCode) or (@AccountType = 'OFF') )
