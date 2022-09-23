@@ -23,6 +23,8 @@ SELECT DISTINCT
 	, IsNull(r.UDF_REGION,'') AS Reg
 	, IsNull(ap.UDF_NAME,'') AS App
 	, i.UDF_MASTER_VENDOR AS Mv
+	, i.UDF_ORGANIC as 'Org'
+	, i.UDF_BIODYNAMIC as 'Bio'
 	, CASE WHEN i.UDF_SAMPLE_FOCUS = 'Y' THEN 'Y' ELSE '' END AS Foc
 	, h.SalespersonNo AS InvR
 	, c.SalespersonNo AS AcctR

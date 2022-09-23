@@ -53,6 +53,8 @@ SELECT DISTINCT [ItemCode] as Code
       ,[App]
       ,[Mv]
       ,[Foc]
+	  ,Org
+	  ,Bio
   FROM [dbo].[PortalWebInvoicesItem]
                   
 where ((@AccountType = 'REP' and (InvR = @RepCode or AcctR = @RepCode)) or (@AccountType = 'OFF') )
