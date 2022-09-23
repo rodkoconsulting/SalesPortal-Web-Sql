@@ -24,7 +24,6 @@ SELECT DISTINCT
 	, IsNull(ap.UDF_NAME,'') AS App
 	, i.UDF_MASTER_VENDOR AS Mv
 	, CASE WHEN i.UDF_SAMPLE_FOCUS = 'Y' THEN 'Y' ELSE '' END AS Foc
-	, CASE WHEN i.UDF_BM_FOCUS = 'Y' THEN 'Y' ELSE '' END AS FocBm
 	, h.SalespersonNo AS InvR
 	, c.SalespersonNo AS AcctR
 FROM InvHist h INNER JOIN
