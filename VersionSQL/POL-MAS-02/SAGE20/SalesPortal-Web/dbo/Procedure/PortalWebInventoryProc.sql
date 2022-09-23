@@ -48,6 +48,11 @@ SELECT Main = (SELECT
       ,[ScoreOther]
       ,[FocusBm]
       ,[OnPoSort]
+	   ,[Regen]
+      ,[Nat]
+      ,[Veg]
+      ,[Hve]
+      ,[Rcpt]
   FROM [SalesPortal-Web].[dbo].[PortalWebInventoryMain]
 FOR JSON PATH
 ),
