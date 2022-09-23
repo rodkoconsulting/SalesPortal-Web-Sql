@@ -1,6 +1,6 @@
 ﻿/****** Object:  View [dbo].[PortalWebOrdersMain]    Committed by VersionSQL https://www.versionsql.com ******/
 
-CREATE VIEW [dbo].[PortalWebOrdersMain-new]
+CREATE VIEW [dbo].[PortalWebOrdersMain]
 AS
 WITH Po AS
 (
@@ -39,6 +39,7 @@ SELECT     h.SalespersonNo as Rep
 		   ,left(UDF_NJ_COOP,10) as CoopNo
 		   ,Comment
 		   ,'Y' AS Invoiced
+		   ,Replace(h.ShipToName,'''','') as ShipTo
 		   , d.ItemCode
 FROM         MAS_POL.dbo.SO_InvoiceHeader h INNER JOIN MAS_POL.dbo.SO_InvoiceDetail d
 				ON h.InvoiceNo = d.InvoiceNo
@@ -61,6 +62,7 @@ SELECT     h.SalespersonNo as Rep
 		   ,UDF_NJ_COOP as CoopNo
 		   ,Comment
 		   ,'' AS Invoiced
+		   ,Replace(h.ShipToName,'''','') as ShipTo
 		   , d.ItemCode
 FROM         MAS_POL.dbo.SO_SalesOrderHeader h INNER JOIN
                        MAS_POL.dbo.SO_SalesOrderDetail d ON h.SalesOrderNo = d.SalesOrderNo
@@ -79,6 +81,7 @@ SELECT     h.SalespersonNo as Rep
 		   ,UDF_NJ_COOP as CoopNo
 		   ,Comment
 		   ,'Y' AS Invoiced
+		   ,Replace(h.ShipToName,'''','') as ShipTo
 		   , d.ItemCode
 FROM         MAS_POL.dbo.AR_InvoiceHistoryHeader h INNER JOIN
                        MAS_POL.dbo.AR_InvoiceHistoryDetail d ON h.InvoiceNo = d.InvoiceNo and
@@ -98,6 +101,7 @@ SELECT	   a.UDF_REP_CODE as Rep
 		   ,'' as CoopNo
 		   ,Comment
 		   ,'' AS Invoiced
+		   ,Replace(a.ShipToName,'''','') as ShipTo
 		   , ItemCode
 FROM po
 	INNER JOIN MAS_POL.dbo.PO_ShipToAddress a ON po.ShipToCode = a.ShipToCode
@@ -117,6 +121,7 @@ SELECT
 	,CoopNo as Coop
 	,UDF_TERRITORY AS Ter
 	,o.Invoiced as Inv
+	,o.ShipTo as ShpTo
 	FROM ORDERS o
 INNER JOIN MAS_POL.dbo.AR_Salesperson s ON o.Rep = s.SalespersonNo and o.RepDiv = s.SalespersonDivisionNo
 WHERE o.ItemCode NOT IN ('/COBRA')

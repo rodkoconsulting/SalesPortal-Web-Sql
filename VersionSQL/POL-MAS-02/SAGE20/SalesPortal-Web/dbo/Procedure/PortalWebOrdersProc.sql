@@ -24,6 +24,7 @@ SELECT Main = (SELECT
 	  ,[Inv]
       ,[Ter]
 	  ,[Rep]
+	  ,[ShpTo]
 	  ,Item
 	  ,[Desc]
       ,[Qty]
