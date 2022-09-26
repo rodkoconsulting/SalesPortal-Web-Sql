@@ -1,0 +1,76 @@
+﻿/****** Object:  Procedure [dbo].[PortalWebAccountsProc]    Committed by VersionSQL https://www.versionsql.com ******/
+
+CREATE PROCEDURE [dbo].[PortalWebAccountsProc]
+	@UserName varchar(25)
+AS
+BEGIN
+	SET NOCOUNT ON
+	DECLARE @RepCode varchar(4);
+	DECLARE @AccountType char(3);
+SELECT @RepCode = RepCode FROM Web_ActiveUsers where UserName=@UserName
+SELECT @AccountType = AccountType FROM Web_ActiveUsers where UserName=@UserName;
+WITH LastOrdered AS
+(
+SELECT		c.ARDIVISIONNO
+			, c.CUSTOMERNO		
+			, MAX(INVOICEDATE) AS LastOrdered
+FROM         MAS_POL.dbo.AR_CUSTOMER c LEFT OUTER JOIN
+                      MAS_POL.dbo.AR_INVOICEHISTORYHEADER h ON c.ARDIVISIONNO = c.ARDIVISIONNO AND c.CUSTOMERNO = h.CUSTOMERNO
+where INVOICETYPE='IN'
+GROUP BY  c.ARDIVISIONNO, c.CUSTOMERNO
+)
+SELECT Main = (
+SELECT		c.ARDivisionNo+c.CustomerNo as AcctNo
+			, CustomerName as AcctName
+			, PriceLevel as [Level]
+			, a.UDF_DELIVERY_MON + a.UDF_DELIVERY_TUES + a.UDF_DELIVERY_WED + a.UDF_DELIVERY_THURS + a.UDF_DELIVERY_FRI AS [Days]
+			, UDF_NJ_COOP as Coop
+			, UDF_WINE_BUYER as Wb1
+			, UDF_WINE_BUYER_2 as Wb2
+			, UDF_WINE_BUYER_3 as Wb3
+			, UDF_WINE_BUYER_PHONE as Wb1Phone
+			, UDF_WINE_BUYER_PHONE_2 as Wb2Phone
+			, UDF_WINE_BUYER_PHONE_3 as Wb3Phone
+			, UDF_WINE_BUYER_EMAIL as Wb1Email
+			, UDF_WINE_BUYER_2_EMAIL as Wb2Email
+			, UDF_WINE_BUYER_3_EMAIL as Wb3Email
+			, UDF_AFFILIATIONS as Affil
+			, UDF_ACCOUNT_TYPE AS [Type]
+			, UDF_GROWTH_POTENTIAL AS Growth
+			, UDF_STORE_REST_FOCUS AS Focus
+			, UDF_OTHER_KEY_SUPPLIERS AS Sup
+			, RTRIM(LTRIM(SHIPTOADDRESS1+CASE WHEN LEN(LTRIM(SHIPTOADDRESS2))>0 THEN CHAR(13)+ CHAR(10)+ SHIPTOADDRESS2 ELSE '' END)) as Addr
+			, SHIPTOCITY as City
+			, SHIPTOSTATE as [State]
+			, SHIPTOZIPCODE as Zip
+			, CASE WHEN UDF_CUST_ACTIVE_STAT <> 'Y' THEN 'I'
+				WHEN Year(UDF_LIC_EXPIRATION)>1900 and UDF_LIC_EXPIRATION < GETDATE() THEN 'E'
+				WHEN TERMSCODE = '00' THEN 'CS'
+				WHEN TERMSCODE = '05' THEN 'CI'
+				WHEN TERMSCODE = '10' THEN 'CP'
+				WHEN TERMSCODE = '95' THEN 'CP'
+				WHEN (AGINGCATEGORY1 + AGINGCATEGORY2 + AGINGCATEGORY3 + AGINGCATEGORY4) > 0 THEN 'P'
+				ELSE '' END AS [Status]
+			, CASE WHEN @AccountType <> 'REP' THEN c.SalespersonNo ELSE '' END as Rep
+			, CASE WHEN UDF_TERRITORY IN ('NY Metro','NY Long Island','NY Upstate','NY Westchester / Hudson','NJ','Pennsylvania') THEN UDF_TERRITORY ELSE 'Manager' END AS Region
+			, CONVERT(DECIMAL(9,2),(ROUND(IsNull(CURRENTBALANCE+AGINGCATEGORY1+AGINGCATEGORY2+AGINGCATEGORY3+AGINGCATEGORY4,0),2))) AS Bal
+			, CONVERT(DECIMAL(9,2),(ROUND(CASE WHEN (AGINGCATEGORY1+AGINGCATEGORY2+AGINGCATEGORY3+AGINGCATEGORY4)<=0 THEN 0 ELSE(AGINGCATEGORY1+AGINGCATEGORY2+AGINGCATEGORY3+AGINGCATEGORY4) END,2))) AS Due
+			, IsNull(UDF_INSTRUCTIONS,'') AS DelNote
+			, CASE WHEN UDF_PO_REQUIRED = 'Y' THEN 'Y' ELSE '' END AS Po
+			, CASE WHEN SUBSTRING(CUSTOMERTYPE,3,2)='ON' THEN 'Y' ELSE '' END AS Prem
+			, UDF_LICENSE_NUM as Lic
+			, a.UDF_COUNTY as County
+			, IsNull(CONVERT(varchar, LastOrdered, 12),'') as [Last]
+			, IsNull(Notes,'') as AcctNotes,
+			UDF_REP_EMAIL_ADDRESS as RepEmail,
+			c.ShipMethod as Via       
+FROM         MAS_POL.dbo.AR_Customer c INNER JOIN
+             MAS_POL.dbo.SO_SHIPTOADDRESS a ON c.ARDIVISIONNO = a.ARDIVISIONNO AND c.CUSTOMERNO = a.CUSTOMERNO AND c.PRIMARYSHIPTOCODE = a.SHIPTOCODE INNER JOIN
+             MAS_POL.dbo.AR_UDT_SHIPPING s ON a.UDF_REGION_CODE = s.UDF_REGION_CODE LEFT OUTER JOIN
+             dbo.PortalWebAccountNotes n ON c.ARDIVISIONNO = n.ARDIVISIONNO AND c.CUSTOMERNO = n.CUSTOMERNO LEFT OUTER JOIN
+             LastOrdered o ON c.ARDIVISIONNO =o.ARDIVISIONNO AND c.CUSTOMERNO = o.CUSTOMERNO
+WHERE (PriceLevel <> '') and ((c.ARDIVISIONNO = '00') or (c.ARDIVISIONNO = '02')) and ((@AccountType = 'REP' and c.SalespersonNo = @RepCode) or ((@AccountType = 'OFF' or @AccountType = 'EXT') and c.SalespersonNo not like 'XX%'))
+FOR JSON PATH
+)
+FOR JSON PATH, WITHOUT_ARRAY_WRAPPER
+END
