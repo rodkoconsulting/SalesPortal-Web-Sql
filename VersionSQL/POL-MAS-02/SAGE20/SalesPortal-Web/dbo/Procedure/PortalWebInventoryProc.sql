@@ -6,49 +6,49 @@ AS
 BEGIN
 	SET NOCOUNT ON
 SELECT Main = (SELECT
-	   [Focus]
-      ,[ItemCode]
-      ,[Brand]
-      ,[Description]
-      ,[Vintage]
-      ,[Uom]
-      ,[BottleSize]
-      ,[DamagedNotes]
-      ,[QtyAvailable]
-      ,[QtyOnHand]
-      ,[OnSO]
-      ,[OnMO]
-      ,[OnBO]
-      ,[RestrictOffSale]
-      ,[RestrictOnPremise]
-      ,[RestrictOffSaleNotes]
-      ,[RestrictAllocated]
-      ,[RestrictApproval]
-      ,[RestrictMaxCases]
-      ,[RestrictState]
-      ,[RestrictSamples]
-      ,[RestrictBo]
-      ,[RestrictMo]
-      ,[Core]
-      ,[Type]
-      ,[Varietal]
-      ,[Organic]
-      ,[Biodynamic]
-      ,[Country]
-      ,[Region]
-      ,[Appellation]
-      ,[MasterVendor]
-      ,[Closure]
-      ,[Upc]
-      ,[ScoreWA]
+	  [ItemCode] as Code
+	  ,[Brand]
+	  ,[Description] as [Desc]
+	  ,[Vintage]
+	  ,[Uom]
+	  ,[BottleSize] as Size
+	  ,[DamagedNotes] as DamNotes
+	  ,[MasterVendor] as MVendor
+	  ,[Closure]
+	  ,[Type]
+	  ,[Varietal]
+	  ,[Organic] as Org
+      ,[Biodynamic] as Bio
+	  ,[Focus]
+	  ,[Country]
+	  ,[Region]
+      ,[Appellation] as App
+	  ,[RestrictOffSale] as RstOff
+	  ,[RestrictOffSaleNotes] as RstOffNotes
+	  ,[RestrictOnPremise] as RstPrem
+	  ,[RestrictAllocated] as RstAllo
+	  ,[RestrictApproval] as RstApp
+	  ,[RestrictMaxCases] as RstMax
+	  ,[RestrictState] as RstState
+	  ,[RestrictSamples] as RstSam
+	  ,[RestrictBo] as RstBo
+	  ,[RestrictMo] as RstMo
+	  ,[Core]
+	  ,[FocusBm]
+	  ,[Upc]
+	  ,[ScoreWA]
       ,[ScoreWS]
-      ,[ScoreIWC]
+      ,[ScoreIWC] as ScoreVFC
       ,[ScoreBH]
       ,[ScoreVM]
       ,[ScoreOther]
-      ,[FocusBm]
+      ,[QtyAvailable] as QtyA
+      ,[QtyOnHand] as QtyOh
+      ,[OnSO] as OnSo
+      ,[OnMO] as OnMo
+      ,[OnBO] as OnBo
       ,[OnPoSort]
-	   ,[Regen]
+	  ,[Regen]
       ,[Nat]
       ,[Veg]
       ,[Hve]
@@ -56,18 +56,18 @@ SELECT Main = (SELECT
   FROM [SalesPortal-Web].[dbo].[PortalWebInventoryMain]
 FOR JSON PATH
 ),
-Price = (SELECT [ItemCode]
+Price = (SELECT [ItemCode] as Code
       ,[Level]
       ,[Date]
       ,[Price]
-      ,[Reduced]
+      ,[Reduced] as Red
   FROM [SalesPortal-Web].[dbo].[PortalWebInventoryPrice]
 FOR JSON PATH
 ),
 Po = (SELECT
-[ItemCode]
-      ,[OnPO]
-      ,[RequiredDate]
+      [ItemCode] as Code
+      ,[OnPO] as OnPo
+      ,[RequiredDate] as EtaDate
       ,[PoDate]
   FROM [SalesPortal-Web].[dbo].[PortalWebInventoryPo]
 FOR JSON PATH
