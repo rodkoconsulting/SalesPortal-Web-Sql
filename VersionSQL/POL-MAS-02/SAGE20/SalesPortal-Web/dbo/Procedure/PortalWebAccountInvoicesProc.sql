@@ -40,7 +40,7 @@ SELECT Main = (SELECT
 Item = (SELECT DISTINCT 
 			h.Code
 			, UDF_BRAND_NAMES as Brand
-			, UDF_DESCRIPTION as [Description]
+			, UDF_DESCRIPTION as [Desc]
 			, UDF_VINTAGE as Vintage
 			, CAST(REPLACE(SalesUnitOfMeasure, 'C', '') AS INT) AS Uom
 			, UDF_BOTTLE_SIZE AS Size
