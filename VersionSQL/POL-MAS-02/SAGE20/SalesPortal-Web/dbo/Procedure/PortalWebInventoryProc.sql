@@ -1,6 +1,6 @@
 ﻿/****** Object:  Procedure [dbo].[PortalWebInventoryProc]    Committed by VersionSQL https://www.versionsql.com ******/
 
-CREATE PROCEDURE [dbo].[PortalWebInventoryProc-new]
+CREATE PROCEDURE [dbo].[PortalWebInventoryProc]
 	-- Add the parameters for the stored procedure here
 AS
 BEGIN
@@ -21,6 +21,7 @@ SELECT	d.ItemCode
 		, SUM(d.QuantityOrdered - d.QuantityReceived) AS OnPo
 		, MAX(h.RequiredExpireDate) AS RequiredDate
 		, MAX(h.PurchaseOrderDate) AS PoDate
+		, MAX(h.UDF_AVAILABLE_COMMENT) AS AvailableComment
 FROM MAS_POL.dbo.PO_PurchaseOrderHeader h INNER JOIN
      MAS_POL.dbo.PO_PurchaseOrderDetail d ON h.PurchaseOrderNo = d.PurchaseOrderNo INNER JOIN
      MAS_POL.dbo.CI_Item i ON d.ItemCode = i.ItemCode
@@ -33,6 +34,7 @@ SELECT	ItemCode
 		, QuantityOnHand as OnPO
 		, '1753-01-01 00:00:00.000' as RequiredDate
 		, '1753-01-01 00:00:00.000' as PoDate
+		, '' as AvailableComment
 FROM         MAS_POL.dbo.IM_ItemWarehouse
 WHERE     (WarehouseCode = '900' and QuantityOnHand > 0)
 ),
@@ -258,10 +260,10 @@ SELECT Main = (SELECT
 				, CONVERT(DECIMAL(9,2),(ROUND(IsNull(s.QuantityHeldMo,0),2))) as OnMo
 				, CONVERT(DECIMAL(9,2),(ROUND(IsNull(s.QuantityHeldBo,0),2))) as OnBo
 				, CONVERT(DECIMAL(9,2),(ROUND(ISNULL(potot.OnPo,0),2))) as OnPoSort
-				, CASE WHEN i.UDF_REGENERATIVE = 'Y' THEN 'x' ELSE '' END AS Regen
-				, CASE WHEN i.UDF_NATURAL = 'Y' THEN 'x' ELSE '' END AS Nat
-				, CASE WHEN i.UDF_VEGAN = 'Y' THEN 'x' ELSE '' END AS Veg
-				, CASE WHEN i.UDF_HAUTE_VALEUR = 'Y' THEN 'x' ELSE '' END AS Hve
+				, CASE WHEN i.UDF_REGENERATIVE = 'Y' THEN 'Y' ELSE '' END AS Regen
+				, CASE WHEN i.UDF_NATURAL = 'Y' THEN 'Y' ELSE '' END AS Nat
+				, CASE WHEN i.UDF_VEGAN = 'Y' THEN 'Y' ELSE '' END AS Veg
+				, CASE WHEN i.UDF_HAUTE_VALEUR = 'Y' THEN 'Y' ELSE '' END AS Hve
 				, CASE WHEN YEAR(LastReceiptDate)>1900 THEN CONVERT(varchar,LastReceiptDate,23) ELSE '' END as Rcpt
 FROM 
 MAS_POL.dbo.CI_ITEM i
@@ -289,8 +291,9 @@ Po = (SELECT	ItemCode as Code
 		, CONVERT(DECIMAL(9,2),(ROUND(Sum(OnPo),2))) as OnPo
 		, CASE WHEN YEAR(MAX(RequiredDate)) < 2000 THEN '' ELSE CONVERT(varchar, MAX(RequiredDate), 12) END AS EtaDate
 		, CONVERT(varchar, MAX(PoDate), 12) AS PoDate
+		, AvailableComment as AvailCmt
 FROM PoUnion
-GROUP BY ItemCode, PurchaseOrderNo
+GROUP BY ItemCode, PurchaseOrderNo, AvailableComment
 FOR JSON PATH
 )
 FOR JSON PATH, WITHOUT_ARRAY_WRAPPER

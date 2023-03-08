@@ -98,7 +98,7 @@ SELECT DISTINCT
 	OrderNo as OrdNo
 	,o.ItemCode as Item
 	, CASE WHEN i.UDF_BRAND_NAMES = '' THEN o.ItemCodeDesc ELSE '' END AS 'Desc'
-	, CONVERT(DECIMAL(9,2),(ROUND(Quantity,2))) AS Qty
+	, CONVERT(DECIMAL(9,4),(ROUND(Quantity,4))) AS Qty
 	, CONVERT(DECIMAL(9,2),(ROUND(Price,2))) AS Pri
 	, CONVERT(DECIMAL(9,2),(ROUND(Total,2))) AS Tot
 	, LineComment as ItmCmt

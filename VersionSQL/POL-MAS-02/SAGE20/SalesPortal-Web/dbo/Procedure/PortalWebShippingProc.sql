@@ -33,6 +33,9 @@ SELECT      IsNull(c.CountryName,'') as Ctry
 				, CONVERT(DECIMAL(9,2),(ROUND(i.Volume * d.QuantityOrdered,2))) as Lit
 				, CONVERT(DECIMAL(9,2),(ROUND(i.Volume * i.StandardUnitCost,2))) as Cost
 				, CONVERT(DECIMAL(9,2),(ROUND(d.ExtensionAmt,2))) as Tot
+				, v.UDF_TTBFPID as TTB_FPID
+				, v.UDF_TTB_MANUFACTURER as TTB_Manufacturer
+				, CASE WHEN v.UDF_ASSIGNED = 'Y' THEN 'x' ELSE '' END as TTB_Assigned
 FROM            MAS_POL.dbo.PO_PurchaseOrderHeader AS h INNER JOIN
                          MAS_POL.dbo.SO_ShippingRateHeader AS s ON h.ShipVia = s.ShippingCode INNER JOIN
                          MAS_POL.dbo.AP_Vendor AS v ON h.APDivisionNo = v.APDivisionNo AND h.VendorNo = v.VendorNo INNER JOIN
