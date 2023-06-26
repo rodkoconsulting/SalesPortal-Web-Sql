@@ -1,6 +1,6 @@
-﻿/****** Object:  Procedure [dbo].[PortalWebAccountInvoicesProc]    Committed by VersionSQL https://www.versionsql.com ******/
+﻿/****** Object:  Procedure [dbo].[PortalWebAccountInvoicesProc-test]    Committed by VersionSQL https://www.versionsql.com ******/
 
-CREATE PROCEDURE [dbo].[PortalWebAccountInvoicesProc]
+CREATE PROCEDURE [dbo].[PortalWebAccountInvoicesProc-test]
 	-- Add the parameters for the stored procedure here
 	@AcctNo varchar(12)
 AS
@@ -52,7 +52,7 @@ Item = (SELECT DISTINCT
 			, UDF_MASTER_VENDOR as MVendor
 			, CASE WHEN ISNULL(UDF_BM_FOCUS,'')='Y' THEN 'Y' ELSE '' END as FocusBm
 			, UDF_COUNTRY AS Country
-			
+			, UDF_RESTRICT_ALLOCATED as Allo
 		FROM History h INNER JOIN
 			MAS_POL.dbo.CI_Item i ON h.Code = i.ItemCode LEFT OUTER JOIN
 			MAS_POL.dbo.CI_UDT_VARIETALS AS v ON i.UDF_VARIETALS_T = v.UDF_VARIETAL_CODE LEFT OUTER JOIN

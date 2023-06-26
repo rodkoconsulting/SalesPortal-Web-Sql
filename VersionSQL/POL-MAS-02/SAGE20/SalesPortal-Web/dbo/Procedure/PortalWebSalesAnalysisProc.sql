@@ -37,7 +37,7 @@ SELECT			c.CustomerName
 FROM            MAS_POL.dbo.AR_Salesperson s
 				INNER JOIN MAS_POL.dbo.AR_Customer c ON s.SalespersonDivisionNo = c.SalespersonDivisionNo AND s.SalespersonNo = c.SalespersonNo
 				INNER JOIN InvHist h ON c.CustomerNo = h.CustomerNo AND c.ARDivisionNo = h.ARDivisionNo
-WHERE      c.SalespersonNo NOT LIKE 'XX%'
+WHERE      c.SalespersonNo NOT LIKE 'XX%' and ((@AccountType = 'REP' and s.SalesPersonNo = @RepCode) or (@AccountType = 'OFF') ) 
 GROUP BY c.CustomerName, c.SalespersonNo
 )
 SELECT Main = (

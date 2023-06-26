@@ -26,6 +26,7 @@ SELECT DISTINCT
 	, i.UDF_ORGANIC as 'Org'
 	, i.UDF_BIODYNAMIC as 'Bio'
 	, CASE WHEN i.UDF_SAMPLE_FOCUS = 'Y' THEN 'Y' ELSE '' END AS Foc
+	, CASE WHEN i.UDF_RESTRICT_ALLOCATED = 'Y' THEN 'Y' ELSE '' END AS RstAllo
 	, h.SalespersonNo AS InvR
 	, c.SalespersonNo AS AcctR
 FROM InvHist h INNER JOIN

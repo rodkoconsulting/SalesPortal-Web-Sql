@@ -54,7 +54,7 @@ SELECT     d.ITEMCODE
 		, Sum(Case WHEN h.CANCELREASONCODE='BH' or d.UnitPrice = 0 then d.QUANTITYORDERED ELSE 0 End) as QuantityHeldBh
 FROM         MAS_POL.dbo.SO_SALESORDERHEADER h INNER JOIN
                       MAS_POL.dbo.SO_SALESORDERDETAIL d ON h.SALESORDERNO = d.SALESORDERNO       
-WHERE  h.ORDERSTATUS IN ('O','N','H') and d.ITEMTYPE='1' and d.WAREHOUSECODE='000'
+WHERE  h.ORDERSTATUS IN ('O','N','H') and d.ITEMTYPE='1' and (d.WAREHOUSECODE='000' or d.WAREHOUSECODE='001')
 GROUP BY d.ITEMCODE
 UNION
 SELECT     d.ITEMCODE
@@ -247,15 +247,18 @@ SELECT Main = (SELECT
 				, i.UDF_UPC_CODE AS Upc
 				, i.UDF_PARKER AS ScoreWA
 				, i.UDF_SPECTATOR AS ScoreWS
-				, i.UDF_TANZER as ScoreVFC
+				, i.UDF_VFC as ScoreVFC
 				, i.UDF_BURGHOUND AS ScoreBH
 				, i.UDF_GALLONI_SCORE AS ScoreVM
-				, i.UDF_VFC AS ScoreOther
-				, CONVERT(DECIMAL(9,2),(ROUND(w.QuantityOnHand 
+				, i.UDF_TANZER AS ScoreOther
+				, CASE WHEN CONVERT(DECIMAL(9,2),(ROUND(w.QuantityOnHand 
 						- IsNull(p.POQuantityHeld,0) - IsNull(s.QuantityHeld,0) 
-						- IsNull(s.QuantityHeldBh,0) - IsNull(s.QuantityHeldMo,0) 
-						- IsNull(r.QuantityHeld,0),2))) AS QtyA
-				, CONVERT(DECIMAL(9,2),(ROUND(w.QuantityOnHand - IsNull(s.QuantityHeldBh,0),2))) as QtyOh
+						- IsNull(s.QuantityHeldMo,0) 
+						- IsNull(r.QuantityHeld,0),2))) > 0 THEN CONVERT(DECIMAL(9,2),(ROUND(w.QuantityOnHand 
+						- IsNull(p.POQuantityHeld,0) - IsNull(s.QuantityHeld,0) 
+						- IsNull(s.QuantityHeldMo,0) 
+						- IsNull(r.QuantityHeld,0),2))) ELSE 0 END AS QtyA
+				, CASE WHEN CONVERT(DECIMAL(9,2),(ROUND(w.QuantityOnHand,2))) > 0 THEN CONVERT(DECIMAL(9,2),(ROUND(w.QuantityOnHand,2))) ELSE 0 END as QtyOh
 				, CONVERT(DECIMAL(9,2),(ROUND(IsNull(s.QuantityHeld,0),2))) as OnSo
 				, CONVERT(DECIMAL(9,2),(ROUND(IsNull(s.QuantityHeldMo,0),2))) as OnMo
 				, CONVERT(DECIMAL(9,2),(ROUND(IsNull(s.QuantityHeldBo,0),2))) as OnBo
@@ -276,7 +279,7 @@ MAS_POL.dbo.CI_ITEM i
 	LEFT OUTER JOIN MAS_POL.dbo.CI_UDT_APPELLATION as a ON i.UDF_SUBREGION_T = a.UDF_APPELLATION
 	LEFT OUTER JOIN PoTotals as potot ON i.ItemCode = potot.ItemCode
 WHERE     (i.ITEMTYPE = '1') and (i.InactiveItem !='Y') and (i.ProductLine != 'SAMP') and (w.WarehouseCode = '000') and 
-          (w.QuantityOnHand + w.QuantityOnPurchaseOrder + w.QuantityOnSalesOrder + w.QuantityOnBackOrder > 0.04)
+          (w.QuantityOnHand + w.QuantityOnPurchaseOrder + w.QuantityOnSalesOrder + w.QuantityOnBackOrder + IsNull(s.QuantityHeldBh,0) > 0.04)
 FOR JSON PATH
 ),
 Price = (SELECT	ItemCode as Code

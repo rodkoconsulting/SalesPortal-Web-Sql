@@ -16,7 +16,7 @@ WHERE ItemCode NOT IN ('/C','/COBRA')
 SELECT 
 	h.InvoiceNo as 'InvNo'
 	,h.HeaderSeqNo
-	, CASE WHEN h.InvoiceType = 'CM' THEN 'C' ELSE 'I' END AS Typ
+	,h.InvoiceType AS Typ
 	, h.ARDivisionNo + h.CustomerNo AS AcctNo
 	, CONVERT(varchar,h.InvoiceDate,23) as Date
 	, h.Comment as Cmt

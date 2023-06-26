@@ -1,6 +1,6 @@
-﻿/****** Object:  Procedure [dbo].[PortalWebInvoicesProc]    Committed by VersionSQL https://www.versionsql.com ******/
+﻿/****** Object:  Procedure [dbo].[PortalWebInvoicesProc_old]    Committed by VersionSQL https://www.versionsql.com ******/
 
-CREATE PROCEDURE [dbo].[PortalWebInvoicesProc]
+CREATE PROCEDURE [dbo].[PortalWebInvoicesProc_old]
 	-- Add the parameters for the stored procedure here
 	@UserName varchar(25)
 AS
@@ -55,7 +55,6 @@ SELECT DISTINCT [ItemCode] as Code
       ,[Foc]
 	  ,Org
 	  ,Bio
-	  ,RstAllo
   FROM [dbo].[PortalWebInvoicesItem]
                   
 where ((@AccountType = 'REP' and (InvR = @RepCode or AcctR = @RepCode)) or (@AccountType = 'OFF') )
