@@ -1,6 +1,6 @@
-﻿/****** Object:  Procedure [dbo].[PortalWebSalesAnalysisProc]    Committed by VersionSQL https://www.versionsql.com ******/
+﻿/****** Object:  Procedure [dbo].[PortalWebSalesAnalysisProc-old]    Committed by VersionSQL https://www.versionsql.com ******/
 
-CREATE PROCEDURE [dbo].[PortalWebSalesAnalysisProc]
+CREATE PROCEDURE [dbo].[PortalWebSalesAnalysisProc-old]
 	@UserName varchar(25)
 AS
 BEGIN
@@ -14,17 +14,15 @@ SELECT @RepCode = RepCode FROM Web_ActiveUsers where UserName=@UserName
 SELECT @AccountType = AccountType FROM Web_ActiveUsers where UserName=@UserName;  
 WITH InvHist AS 
 (
-SELECT       DISTINCT h.InvoiceNo, h.HeaderSeqNo, InvoiceType, InvoiceDate, h.ARDivisionNo, h.CustomerNo, c.SalesPersonNo, h.Comment, h.UDF_NJ_COOP, ItemCode, ExtensionAmt
+SELECT       DISTINCT h.InvoiceNo, h.HeaderSeqNo, InvoiceType, InvoiceDate, ARDivisionNo, CustomerNo, SalesPersonNo, Comment, UDF_NJ_COOP, ItemCode, ExtensionAmt
 FROM            MAS_POL.dbo.AR_InvoiceHistoryHeader h INNER JOIN
-				MAS_POL.dbo.AR_InvoiceHistoryDetail d on h.InvoiceNo = d.InvoiceNo and h.HeaderSeqNo = d.HeaderSeqNo INNER JOIN 
-				MAS_POL.dbo.AR_Customer c on h.CustomerNo = c.CustomerNo and h.ARDivisionNo = c.ARDivisionNo
-WHERE ((@AccountType = 'REP' and c.SalesPersonNo = @RepCode) or (@AccountType = 'OFF') ) and ModuleCode = 'S/O' and InvoiceDate >= DATEFROMPARTS ( DATEPART(yyyy, @TodayDate) - 1, 1, 1 ) and ItemType = 1
+				MAS_POL.dbo.AR_InvoiceHistoryDetail d on h.InvoiceNo = d.InvoiceNo and h.HeaderSeqNo = d.HeaderSeqNo
+WHERE ((@AccountType = 'REP' and SalesPersonNo = @RepCode) or (@AccountType = 'OFF') ) and ModuleCode = 'S/O' and InvoiceDate >= DATEFROMPARTS ( DATEPART(yyyy, @TodayDate) - 1, 1, 1 ) and ItemType = 1
 UNION ALL
-SELECT        DISTINCT h.InvoiceNo, h.InvoiceNo, InvoiceType, ShipDate, h.ARDivisionNo, h.CustomerNo, c.SalesPersonNo, h.Comment, h.UDF_NJ_COOP, ItemCode, ExtensionAmt
+SELECT        DISTINCT h.InvoiceNo, h.InvoiceNo, InvoiceType, ShipDate, ARDivisionNo, CustomerNo, SalesPersonNo, Comment, UDF_NJ_COOP, ItemCode, ExtensionAmt
 FROM            MAS_POL.dbo.SO_InvoiceHeader h INNER JOIN
-				MAS_POL.dbo.SO_InvoiceDetail d on h.InvoiceNo = d.InvoiceNo INNER JOIN 
-				MAS_POL.dbo.AR_Customer c on h.CustomerNo = c.CustomerNo and h.ARDivisionNo = c.ARDivisionNo
-WHERE ((@AccountType = 'REP' and c.SalesPersonNo = @RepCode) or (@AccountType = 'OFF') ) and ItemType = 1
+				MAS_POL.dbo.SO_InvoiceDetail d on h.InvoiceNo = d.InvoiceNo
+WHERE ((@AccountType = 'REP' and SalesPersonNo = @RepCode) or (@AccountType = 'OFF') ) and ItemType = 1
 ),
 Sales AS
 (
@@ -39,7 +37,7 @@ SELECT			c.CustomerName
 FROM            MAS_POL.dbo.AR_Salesperson s
 				INNER JOIN MAS_POL.dbo.AR_Customer c ON s.SalespersonDivisionNo = c.SalespersonDivisionNo AND s.SalespersonNo = c.SalespersonNo
 				INNER JOIN InvHist h ON c.CustomerNo = h.CustomerNo AND c.ARDivisionNo = h.ARDivisionNo
-WHERE      c.SalespersonNo NOT LIKE 'XX%' and ((@AccountType = 'REP' and c.SalesPersonNo = @RepCode) or (@AccountType = 'OFF') ) 
+WHERE      c.SalespersonNo NOT LIKE 'XX%' and ((@AccountType = 'REP' and s.SalesPersonNo = @RepCode) or (@AccountType = 'OFF') ) 
 GROUP BY c.CustomerName, c.SalespersonNo
 )
 SELECT Main = (
