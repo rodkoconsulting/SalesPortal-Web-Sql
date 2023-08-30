@@ -1,0 +1,17 @@
+﻿/****** Object:  Table [dbo].[Web_SampleHeader]    Committed by VersionSQL https://www.versionsql.com ******/
+
+SET ANSI_NULLS ON
+SET QUOTED_IDENTIFIER ON
+CREATE TABLE [dbo].[Web_SampleHeader](
+	[ORDERNO] [bigint] IDENTITY(1,1) NOT NULL,
+	[USERCODE] [char](4) NOT NULL,
+	[SAVEDDATE] [datetime] NOT NULL,
+	[DELIVERYDAY] [datetime] NOT NULL,
+	[NOTES] [varchar](150) NULL,
+	[TOTALBOTTLES] [smallint] NOT NULL,
+	[TOTALQUANTITY] [decimal](16, 8) NOT NULL,
+ CONSTRAINT [PK__Web_Samp__4918B2C14A6E022D] PRIMARY KEY CLUSTERED 
+(
+	[ORDERNO] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, FILLFACTOR = 80) ON [PRIMARY]
+) ON [PRIMARY]

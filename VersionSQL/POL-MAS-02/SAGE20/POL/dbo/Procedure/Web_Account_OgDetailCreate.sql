@@ -1,0 +1,72 @@
+﻿/****** Object:  Procedure [dbo].[Web_Account_OgDetailCreate]    Committed by VersionSQL https://www.versionsql.com ******/
+
+CREATE PROCEDURE [dbo].[Web_Account_OgDetailCreate]
+	-- Add the parameters for the stored procedure here
+	@OrderNo bigint
+	
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	
+	SELECT [ITEMCODE]
+      ,[Core]
+      ,[Organic]
+      ,[Bio]
+      ,[ItemDescription]
+      ,[QuantityAvailable]
+      ,[QtyOnHand]
+      ,[OnSO]
+      ,[OnMO]
+      ,[OnBO]
+      ,[OnPO]
+      ,[MasterVendor]
+      ,[OffSale]
+      ,[OnPremise]
+      ,[OffSaleNotes]
+      ,[Allocated]
+      ,[Approval]
+      ,[MaxCases]
+      ,[State]
+      ,[NS]
+      ,[UOM]
+      ,[WineType]
+      ,[Varietal]
+      ,[Closure]
+      ,[Country]
+      ,[Region]
+      ,[Appellation]
+      ,[UpcCode]
+      ,[HasScore]
+      ,[ScoreWA]
+      ,[ScoreWS]
+      ,[ScoreIWC]
+      ,[ScoreBH]
+      ,[ScoreAG]
+      ,[ScoreOther]
+      ,[BottleSize]
+      ,[Brand]
+      ,[DescriptionShort]
+      ,[Vintage]
+      ,[ORDERNO]
+      ,[SampleFocus]
+      ,[PricingGroup]
+      ,[PriceCase]
+      ,[PriceBottle]
+      ,[DiscountCase]
+      ,[DiscountBottle]
+      ,[DiscountList]
+      ,[MoboList]
+      ,[LastInvoiceDate]
+      ,[LastQuantityShipped]
+      ,[LastPrice]
+      ,[Cases]
+      ,[Bottles]
+      ,[UnitPriceCase]
+      ,[UnitPriceBottle]
+      ,[Total]
+      ,[MoboTotal]
+      ,[IsOverride]
+  FROM [POL].[dbo].[Web_Account_OgDetailsView] WITH (INDEX(PK_Web_Account_OgDetails))
+  WHERE ORDERNO=@OrderNo
+  END

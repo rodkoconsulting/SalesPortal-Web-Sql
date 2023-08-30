@@ -1,0 +1,16 @@
+﻿/****** Object:  Table [dbo].[Web_Account_OgSaved]    Committed by VersionSQL https://www.versionsql.com ******/
+
+SET ANSI_NULLS ON
+SET QUOTED_IDENTIFIER ON
+CREATE TABLE [dbo].[Web_Account_OgSaved](
+	[CUSTOMERNO] [varchar](9) NOT NULL,
+	[ITEMCODE] [varchar](15) NOT NULL,
+	[ARDIVISIONNO] [char](2) NOT NULL,
+ CONSTRAINT [PK_Web_Account_OgSaved] PRIMARY KEY CLUSTERED 
+(
+	[CUSTOMERNO] ASC,
+	[ITEMCODE] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+
+ALTER TABLE [dbo].[Web_Account_OgSaved] ADD  CONSTRAINT [DF_Web_Account_OgSaved_ARDIVISIONNO]  DEFAULT ('00') FOR [ARDIVISIONNO]

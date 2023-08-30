@@ -1,0 +1,17 @@
+﻿/****** Object:  Table [dbo].[Web_Account_MoboDetails]    Committed by VersionSQL https://www.versionsql.com ******/
+
+SET ANSI_NULLS ON
+SET QUOTED_IDENTIFIER ON
+CREATE TABLE [dbo].[Web_Account_MoboDetails](
+	[ORDERNO] [bigint] NOT NULL,
+	[ITEMCODE] [varchar](15) NOT NULL,
+	[SALESORDERNO] [char](7) NOT NULL,
+	[Cases] [int] NOT NULL,
+	[Bottles] [int] NOT NULL,
+ CONSTRAINT [PK__Web_Acco__D9A4959E03BB8E22] PRIMARY KEY CLUSTERED 
+(
+	[ORDERNO] ASC,
+	[ITEMCODE] ASC,
+	[SALESORDERNO] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, FILLFACTOR = 80) ON [PRIMARY]
+) ON [PRIMARY]
