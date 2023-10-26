@@ -24,7 +24,6 @@ CREATE TABLE [dbo].[EmpireWines_Snapshot](
 	[Container Type] [varchar](15) NOT NULL,
 	[Case size] [varchar](8000) NULL,
 	[Pricing] [varchar](40) NULL,
-	[IsHidden] [varchar](10) NULL,
 	[ImageURL] [varchar](83) NULL,
 	[TTB] [varchar](14) NULL
 ) ON [PRIMARY]

@@ -61,7 +61,7 @@ SELECT     distinct @CurrentDate as TimeSync,
 		   Comment,
 		   left(Replace(ShipToName,'''',''),30) as ShipTo
 FROM         MAS_POL.dbo.AR_InvoiceHistoryHeader
-WHERE    InvoiceDate > GETDATE() and InvoiceDate < DateAdd(YEAR, 1, GETDATE()) and ((@AccountType = 'REP' and SalespersonNo = @RepCode) or (@AccountType = 'OFF' and SalespersonNo not like 'XX%'))
+WHERE    CustomerNo not like 'ZZCO%' and InvoiceDate > GETDATE() and InvoiceDate < DateAdd(YEAR, 1, GETDATE()) and ((@AccountType = 'REP' and SalespersonNo = @RepCode) or (@AccountType = 'OFF' and SalespersonNo not like 'XX%'))
 UNION ALL
 SELECT  @CurrentDate as TimeSync,
 		   @RepCode as RepCode,
