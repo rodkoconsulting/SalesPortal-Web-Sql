@@ -2,7 +2,7 @@
 
 CREATE PROCEDURE [dbo].[PortalOrdersSync]
 	@UserName varchar(25),
-	@TimeSync varchar(50)
+	@SyncTime varchar(50)
 AS
 BEGIN
 	SET NOCOUNT ON
@@ -21,7 +21,7 @@ BEGIN
     Set @CurrentDate=GETDATE();
 SELECT @RepCode = RepCode FROM Web_ActiveUsers where UserName=@UserName
 SELECT @AccountType = AccountType FROM Web_ActiveUsers where UserName=@UserName  
-SET @TimeSyncTemp = @TimeSync
+SET @TimeSyncTemp = @SyncTime
 SET @TimeSyncHeaderDay = SUBSTRING(@TimeSyncTemp, 0, PATINDEX('%/%',@TimeSyncTemp))
 SET @TimeSyncTemp = SUBSTRING(@TimeSyncTemp, LEN(@TimeSyncHeaderDay + '/') + 1, LEN(@TimeSyncTemp))
 SET @TimeSyncHeaderTime = SUBSTRING(@TimeSyncTemp, 0, PATINDEX('%/%',@TimeSyncTemp))
@@ -166,14 +166,13 @@ INSERT INTO #temp_PortalOrderHeader
 	 ,CONVERT(varchar, [ShipExpireDate], 12) as 'ShipExpireDate'
 	 ,IsNull(CONVERT(varchar, [ArrivalDate], 12),'') as 'ArrivalDate'
 	 ,[OrderStatus]
-	 ,[HoldCode]
+	 ,[HoldCode]conver
 	 ,[CoopNo]
 	 ,[Comment]
 	 ,ShipTo
   FROM #temp_PortalOrderHeader_Current
   WHERE RepCode = @RepCode
 END
-
 if @@ROWCOUNT>0
 BEGIN
 DELETE FROM PortalOrderHeader_Previous where RepCode = @RepCode
@@ -238,7 +237,7 @@ SELECT     @CurrentDate as TimeSync,
 		   left(CommentText,2048) as Comment                   
 FROM         dbo.PO_PurchaseOrderDetail d INNER JOIN
                       dbo.PO_PurchaseOrderHeader h ON d.PurchaseOrderNo = h.PurchaseOrderNo INNER JOIN
-                      POL.dbo.PO_ShipToAddress a ON h.ShipToCode = a.ShipToCode
+                      dbo.PO_ShipToAddress a ON h.ShipToCode = a.ShipToCode
 WHERE h.OrderType = 'X' AND h.OrderStatus <> 'X' AND ((@AccountType = 'REP' and a.UDF_REP_CODE = @RepCode) or @AccountType = 'OFF')
 
 SELECT @TimeSyncDetailsPrev = MAX(TimeSync) FROM PortalOrderDetail_Previous where RepCode=@RepCode
