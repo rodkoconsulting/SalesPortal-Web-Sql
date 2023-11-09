@@ -29,8 +29,8 @@ SET @TimeSyncTemp = SUBSTRING(@TimeSyncTemp, LEN(@TimeSyncHeaderTime + '/') + 1,
 SET @TimeSyncDetailsDay = SUBSTRING(@TimeSyncTemp, 0, PATINDEX('%/%',@TimeSyncTemp))
 SET @TimeSyncTemp = SUBSTRING(@TimeSyncTemp, LEN(@TimeSyncDetailsDay + '/') + 1, LEN(@TimeSyncTemp))
 SET @TimeSyncDetailsTime = @TimeSyncTemp  
-SET @TimeSyncHeader = TRY_CONVERT(DATETIME, @TimeSyncHeaderDay + @TimeSyncHeaderTime, 121)
-SET @TimeSyncDetails = TRY_CONVERT(DATETIME, @TimeSyncDetailsDay + @TimeSyncDetailsTime, 121)
+SET @TimeSyncHeader = TRY_CONVERT(DATETIME, @TimeSyncHeaderDay + ' ' + @TimeSyncHeaderTime, 121)
+SET @TimeSyncDetails = TRY_CONVERT(DATETIME, @TimeSyncDetailsDay + ' ' + @TimeSyncDetailsTime, 121)
 SELECT     distinct @CurrentDate as TimeSync
 			, @RepCode as RepCode
 			, left(ARDivisionNo,2) as ARDivisionNo
@@ -63,7 +63,7 @@ SELECT     distinct @CurrentDate as TimeSync
 			, left(Replace(ShipToName,'''',''),30) as ShipTo
 FROM         MAS_POL.dbo.SO_SalesOrderDetail d INNER JOIN
                       MAS_POL.dbo.SO_SalesOrderHeader h ON d.SalesOrderNo = h.SalesOrderNo
-WHERE    ((@AccountType = 'REP' and SalespersonNo = @RepCode) or (@AccountType = 'OFF' and SalespersonNo not like 'XX%')) and (CAST(ROUND(QuantityOrdered,2) AS FLOAT) > 0 or ROUND(ExtensionAmt,2) > 0) AND h.CurrentInvoiceNo = ''
+WHERE    ((@AccountType = 'REP' and SalespersonNo = @RepCode) or (@AccountType = 'OFF' and SalespersonNo not like 'XX%')) and (ROUND(QuantityOrdered,2) > 0 or ROUND(ExtensionAmt,2) > 0) AND h.CurrentInvoiceNo = ''
 UNION ALL
 SELECT     distinct @CurrentDate as TimeSync
 			, @RepCode as RepCode
@@ -119,7 +119,7 @@ SELECT
   WHERE 1=2
 IF(@TimeSyncHeaderPrev = @TimeSyncHeader)
 BEGIN
-	INSERT INTO #temp_PortalOrderHeader
+INSERT INTO #temp_PortalOrderHeader
 	SELECT
 		CONVERT(varchar, @CurrentDate , 121) as TimeSync,
 		MIN(Operation) as Operation,
@@ -153,7 +153,7 @@ ORDER BY  [SalesOrderNo]
 
 END
 ELSE
-BEGIN
+BEGIN 
 INSERT INTO #temp_PortalOrderHeader
  SELECT
 	CONVERT(varchar, TimeSync, 121) as TimeSync,
@@ -191,9 +191,9 @@ SELECT     @CurrentDate as TimeSync,
 		   left(h.InvoiceNo,7) as SalesOrderNo,
 		   right(LineKey,3) as LineKey,
 		   left(ItemCode,30) as ItemCode,
-		   CAST(ROUND(QuantityOrdered,2) AS FLOAT) as Quantity,
-		   CAST(ROUND(UnitPrice,2) AS FLOAT) as Price,
-		   CAST(ROUND(ExtensionAmt,2) AS FLOAT) as Total,
+		   CONVERT(numeric(6,2),ROUND(QuantityOrdered,2)) as Quantity,
+		   CONVERT(numeric(7,2),UnitPrice) as Price,
+		   CONVERT(numeric(7,2),ExtensionAmt) as Total,
 		   left(CommentText,2048) as Comment
 INTO #temp_PortalOrderDetail_Current
 FROM         MAS_POL.dbo.SO_InvoiceDetail d INNER JOIN
@@ -205,22 +205,22 @@ SELECT     @CurrentDate as TimeSync,
 		   left(h.SalesOrderNo,7) as SalesOrderNo,
 		   right(LineKey,3) as LineKey,
 		   left(ItemCode,30) as ItemCode,
-		   CAST(ROUND(QuantityOrdered,2) AS FLOAT) as Quantity,
-		   CAST(ROUND(UnitPrice,2) AS FLOAT) as Price,
-		   CAST(ROUND(ExtensionAmt,2) AS FLOAT) as Total,
+		   CONVERT(numeric(6,2),ROUND(QuantityOrdered,2)) as Quantity,
+		   CONVERT(numeric(7,2),UnitPrice) as Price,
+		   CONVERT(numeric(7,2),ExtensionAmt) as Total,
 		   left(CommentText,2048) as Comment
 FROM         MAS_POL.dbo.SO_SalesOrderDetail d INNER JOIN
                       MAS_POL.dbo.SO_SalesOrderHeader h ON d.SalesOrderNo = h.SalesOrderNo
-WHERE    ((@AccountType = 'REP' and SalespersonNo = @RepCode) or (@AccountType = 'OFF' and SalespersonNo not like 'XX%')) and CAST(ROUND(QuantityOrdered,2) AS FLOAT) > 0 AND h.CurrentInvoiceNo = ''
+WHERE    ((@AccountType = 'REP' and SalespersonNo = @RepCode) or (@AccountType = 'OFF' and SalespersonNo not like 'XX%')) and ROUND(QuantityOrdered,2) > 0 AND h.CurrentInvoiceNo = ''
 UNION ALL
 SELECT     @CurrentDate as TimeSync,
 		   @RepCode as RepCode,
 		   left(h.InvoiceNo,7) as SalesOrderNo,
 		   right(DetailSeqNo,3) as LineKey,
 		   left(ItemCode,30) as ItemCode,
-		   CAST(ROUND(QuantityShipped,2) AS FLOAT) as Quantity,
-		   CAST(ROUND(UnitPrice,2) AS FLOAT) as Price,
-		   CAST(ROUND(ExtensionAmt,2) AS FLOAT) as Total,
+		   CONVERT(numeric(6,2),ROUND(QuantityShipped,2)) as Quantity,
+		   CONVERT(numeric(7,2),UnitPrice) as Price,
+		   CONVERT(numeric(7,2),ExtensionAmt) as Total,
 		   left(CommentText,2048) as Comment
 FROM         MAS_POL.dbo.AR_InvoiceHistoryDetail d INNER JOIN
                       MAS_POL.dbo.AR_InvoiceHistoryHeader h ON d.InvoiceNo = h.InvoiceNo and
@@ -232,7 +232,7 @@ SELECT     @CurrentDate as TimeSync,
 		   left(h.PurchaseOrderNo,7) as SalesOrderNo,
 		   right(LineKey,3) as LineKey,
 		   left(ItemCode,30) as ItemCode,
-		   CAST(ROUND(QuantityOrdered,2) AS FLOAT) as Quantity,
+		   CONVERT(numeric(6,2),QuantityOrdered) as Quantity,
 		   0.0 as Price,
 		   0.0 as Total,
 		   left(CommentText,2048) as Comment                   
@@ -304,12 +304,36 @@ WHERE RepCode = @RepCode
 END
 
 
-SELECT H = JSON_QUERY((SELECT TOP(1) TimeSync
-	, Op = CASE WHEN Operation = 'C' THEN 'C' ELSE 'U' END
-	, D = ISNULL((SELECT SalesOrderNo FROM #temp_PortalOrderHeader WHERE Operation = 'D' FOR JSON PATH),'[]')
-	, A = (SELECT SalesOrderNo as OrderNo FROM #temp_PortalOrderHeader FOR JSON PATH)
+SELECT H = ISNULL(JSON_QUERY((SELECT TOP(1) TimeSync
+	, Op = CASE WHEN NOT EXISTS(SELECT SalesOrderNo FROM #temp_PortalOrderHeader) THEN 'E' WHEN Operation = 'C' THEN 'C' ELSE 'U' END
+	, D = ISNULL((SELECT SalesOrderNo as OrderNo FROM #temp_PortalOrderHeader WHERE Operation = 'D' FOR JSON PATH),'[]')
+	, A = ISNULL((SELECT SalesOrderNo as OrderNo
+			, ARDivisionNo as Div
+			, CustomerNo as CustNo
+			, OrderDate as OrderDate
+			, ShipExpireDate as ShipDate
+			, ArrivalDate as ArrDate
+			, OrderStatus as Status
+			, HoldCode as Hold
+			, CoopNo as Coop
+			, Replace(Comment,'''', '''''') as Comment
+			, ShipTo as ShipTo
+		FROM #temp_PortalOrderHeader WHERE Operation !='D' FOR JSON PATH),'[]')
 	FROM #temp_PortalOrderHeader
-	FOR JSON PATH, WITHOUT_ARRAY_WRAPPER))
+	FOR JSON PATH, WITHOUT_ARRAY_WRAPPER)), '{"Op": "E"}')
+	, D = ISNULL(JSON_QUERY((SELECT TOP(1) TimeSync
+	, Op = CASE WHEN NOT EXISTS(SELECT SalesOrderNo FROM #temp_PortalOrderDetail) THEN 'E' WHEN Operation = 'C' THEN 'C' ELSE 'U' END
+	, D = ISNULL((SELECT SalesOrderNo as OrderNo, LineKey as Line FROM #temp_PortalOrderDetail WHERE Operation = 'D' FOR JSON PATH),'[]')
+	, A = ISNULL((SELECT SalesOrderNo as OrderNo
+			, LineKey as Line
+			, ItemCode as Item
+			, Quantity as Qty
+			, Price as Price
+			, Total as Total
+			, Replace(Comment,'''', '''''') as Cmt
+		FROM #temp_PortalOrderDetail WHERE Operation !='D' FOR JSON PATH),'[]')
+	FROM #temp_PortalOrderDetail
+	FOR JSON PATH, WITHOUT_ARRAY_WRAPPER)), '{"Op": "E"}')
 	FOR JSON PATH, WITHOUT_ARRAY_WRAPPER
 
 END
