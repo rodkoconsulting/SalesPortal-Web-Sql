@@ -1,12 +1,10 @@
-﻿/****** Object:  View [dbo].[AR_Salesperson]    Committed by VersionSQL https://www.versionsql.com ******/
+﻿/****** Object:  View [dbo].[AR_Salesperson_Name_Active]    Committed by VersionSQL https://www.versionsql.com ******/
 
-CREATE VIEW [dbo].[AR_Salesperson]
+CREATE VIEW [dbo].[AR_Salesperson_Name_Active]
 AS
-SELECT     SalespersonDivisionNo, SalespersonNo, SalespersonName, EmailAddress, UDF_TERRITORY, UDF_STATE, UDF_ACTIVE
-FROM         MAS_POL.dbo.AR_Salesperson
-
-
-
+SELECT        SalespersonName
+FROM            dbo.AR_Salesperson
+where UDF_ACTIVE = 'Y' AND SalespersonNo NOT LIKE 'HS%' AND SalespersonNo NOT LIKE 'HDA%' AND SalespersonNo NOT LIKE 'HID%' AND SalespersonDivisionNo = '00'
 
 EXECUTE sys.sp_addextendedproperty @name = N'MS_DiagramPane1', @value = N'[0E232FF0-B466-11cf-A24F-00AA00A3EFFF, 1.00]
 Begin DesignProperties = 
@@ -79,15 +77,15 @@ Begin DesignProperties =
          Left = 0
       End
       Begin Tables = 
-         Begin Table = "AR_Salesperson_1"
+         Begin Table = "AR_Salesperson"
             Begin Extent = 
                Top = 6
                Left = 38
-               Bottom = 114
-               Right = 237
+               Bottom = 146
+               Right = 247
             End
             DisplayFlags = 280
-            TopColumn = 27
+            TopColumn = 3
          End
       End
    End
@@ -95,17 +93,6 @@ Begin DesignProperties =
    End
    Begin DataPane = 
       Begin ParameterDefaults = ""
-      End
-      Begin ColumnWidths = 9
-         Width = 284
-         Width = 1500
-         Width = 1500
-         Width = 1500
-         Width = 1500
-         Width = 1500
-         Width = 1500
-         Width = 1500
-         Width = 1500
       End
    End
    Begin CriteriaPane = 
@@ -126,5 +113,5 @@ Begin DesignProperties =
       End
    End
 End
-', @level0type = N'SCHEMA', @level0name = N'dbo', @level1type = N'VIEW', @level1name = N'AR_Salesperson'
-EXECUTE sys.sp_addextendedproperty @name = N'MS_DiagramPaneCount', @value = N'1', @level0type = N'SCHEMA', @level0name = N'dbo', @level1type = N'VIEW', @level1name = N'AR_Salesperson'
+', @level0type = N'SCHEMA', @level0name = N'dbo', @level1type = N'VIEW', @level1name = N'AR_Salesperson_Name_Active'
+EXECUTE sys.sp_addextendedproperty @name = N'MS_DiagramPaneCount', @value = N'1', @level0type = N'SCHEMA', @level0name = N'dbo', @level1type = N'VIEW', @level1name = N'AR_Salesperson_Name_Active'
