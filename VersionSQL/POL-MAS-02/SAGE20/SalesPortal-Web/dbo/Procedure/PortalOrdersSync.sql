@@ -190,9 +190,9 @@ SELECT     @CurrentDate as TimeSync,
 		   left(h.InvoiceNo,7) as SalesOrderNo,
 		   right(LineKey,3) as LineKey,
 		   left(ItemCode,30) as ItemCode,
-		   CONVERT(numeric(6,2),ROUND(QuantityOrdered,2)) as Quantity,
-		   CONVERT(numeric(7,2),UnitPrice) as Price,
-		   CONVERT(numeric(7,2),ExtensionAmt) as Total,
+		   CONVERT(decimal(6,2),ROUND(QuantityOrdered,2)) as Quantity,
+		   CONVERT(decimal(7,2),UnitPrice) as Price,
+		   CONVERT(decimal(7,2),ExtensionAmt) as Total,
 		   left(CommentText,2048) as Comment
 INTO #temp_PortalOrderDetail_Current
 FROM         MAS_POL.dbo.SO_InvoiceDetail d INNER JOIN
@@ -204,9 +204,9 @@ SELECT     @CurrentDate as TimeSync,
 		   left(h.SalesOrderNo,7) as SalesOrderNo,
 		   right(LineKey,3) as LineKey,
 		   left(ItemCode,30) as ItemCode,
-		   CONVERT(numeric(6,2),ROUND(QuantityOrdered,2)) as Quantity,
-		   CONVERT(numeric(7,2),UnitPrice) as Price,
-		   CONVERT(numeric(7,2),ExtensionAmt) as Total,
+		   CONVERT(decimal(6,2),ROUND(QuantityOrdered,2)) as Quantity,
+		   CONVERT(decimal(7,2),UnitPrice) as Price,
+		   CONVERT(decimal(7,2),ExtensionAmt) as Total,
 		   left(CommentText,2048) as Comment
 FROM         MAS_POL.dbo.SO_SalesOrderDetail d INNER JOIN
                       MAS_POL.dbo.SO_SalesOrderHeader h ON d.SalesOrderNo = h.SalesOrderNo
@@ -217,9 +217,9 @@ SELECT     @CurrentDate as TimeSync,
 		   left(h.InvoiceNo,7) as SalesOrderNo,
 		   right(DetailSeqNo,3) as LineKey,
 		   left(ItemCode,30) as ItemCode,
-		   CONVERT(numeric(6,2),ROUND(QuantityShipped,2)) as Quantity,
-		   CONVERT(numeric(7,2),UnitPrice) as Price,
-		   CONVERT(numeric(7,2),ExtensionAmt) as Total,
+		   CONVERT(decimal(6,2),ROUND(QuantityShipped,2)) as Quantity,
+		   CONVERT(decimal(7,2),UnitPrice) as Price,
+		   CONVERT(decimal(7,2),ExtensionAmt) as Total,
 		   left(CommentText,2048) as Comment
 FROM         MAS_POL.dbo.AR_InvoiceHistoryDetail d INNER JOIN
                       MAS_POL.dbo.AR_InvoiceHistoryHeader h ON d.InvoiceNo = h.InvoiceNo and
@@ -231,7 +231,7 @@ SELECT     @CurrentDate as TimeSync,
 		   left(h.PurchaseOrderNo,7) as SalesOrderNo,
 		   right(LineKey,3) as LineKey,
 		   left(ItemCode,30) as ItemCode,
-		   CONVERT(numeric(6,2),QuantityOrdered) as Quantity,
+		   CONVERT(decimal(6,2),QuantityOrdered) as Quantity,
 		   0.0 as Price,
 		   0.0 as Total,
 		   left(CommentText,2048) as Comment                   

@@ -63,9 +63,9 @@ WHERE    (h.OrderType = 'X') and (h.CompletionDate >= DATEADD(year, - 1, GETDATE
 SELECT @TimeSyncHeaderPrev = MAX(TimeSync) FROM PortalSampleOrderHeader_Previous where RepCode=@RepCode
 
 SELECT
-	CONVERT(varchar, TimeSync, 121) as TimeSync,
+	TimeSync,
 	'C' as Operation,
-	[PurchaseOrderNo],[OrderRep],ShipToCode,CONVERT(varchar, [Date], 12) as 'Date',isPosted
+	[PurchaseOrderNo],[OrderRep],ShipToCode,Date,isPosted
   INTO #temp_PortalSampleOrderHeader
   FROM #temp_PortalSampleOrderHeader_Current
   WHERE 1=2
@@ -74,12 +74,12 @@ IF(@TimeSyncHeaderPrev = @TimeSyncHeader)
 BEGIN
 INSERT INTO #temp_PortalSampleOrderHeader
 	SELECT
-	CONVERT(varchar, @CurrentDate , 121) as TimeSync,
+	@CurrentDate as TimeSync,
 	MIN(Operation) as Operation,
 	[PurchaseOrderNo],
 	CASE WHEN MIN(Operation)<>'D' THEN OrderRep ELSE '' END AS OrderRep,
 	CASE WHEN MIN(Operation)<>'D' THEN ShipToCode ELSE '' END AS ShipToCode,
-	CASE WHEN MIN(Operation)<>'D' THEN CONVERT(varchar, [Date], 12) ELSE '' END AS Date,
+	CASE WHEN MIN(Operation)<>'D' THEN Date ELSE '' END AS Date,
 	CASE WHEN MIN(Operation)<>'D' THEN isPosted ELSE 0 END AS isPosted
 FROM
 (
@@ -103,9 +103,9 @@ ELSE
 BEGIN 
 INSERT INTO #temp_PortalSampleOrderHeader
  SELECT
-	CONVERT(varchar, TimeSync, 121) as TimeSync,
+	TimeSync,
 	'C' as Operation,
-	[PurchaseOrderNo],[OrderRep],ShipToCode,CONVERT(varchar, [Date], 12) as 'Date',isPosted
+	[PurchaseOrderNo],[OrderRep],ShipToCode,Date,isPosted
   FROM #temp_PortalSampleOrderHeader_Current
   WHERE RepCode = @RepCode
 END
@@ -138,7 +138,7 @@ WHERE    (h.OrderType = 'X') and (h.CompletionDate >= DATEADD(year, - 1, GETDATE
 SELECT @TimeSyncDetailsPrev = MAX(TimeSync) FROM PortalSampleOrderDetail_Previous where RepCode=@RepCode
 
 SELECT
-	CONVERT(varchar, TimeSync, 121) as TimeSync,
+	TimeSync,
 	'C' as Operation,
 	[PurchaseOrderNo],[LineKey],[ItemCode],[Quantity],[Comment]
   INTO #temp_PortalSampleOrderDetail
@@ -148,7 +148,7 @@ IF(@TimeSyncDetailsPrev = @TimeSyncDetails)
 BEGIN
 	INSERT INTO #temp_PortalSampleOrderDetail
 	SELECT
-	CONVERT(varchar, @CurrentDate , 121) as TimeSync,
+	@CurrentDate as TimeSync,
 	MIN(Operation) as Operation,
 	[PurchaseOrderNo],
 	[LineKey],
@@ -177,7 +177,7 @@ ELSE
 BEGIN
  INSERT INTO #temp_PortalSampleOrderDetail
  SELECT
-	CONVERT(varchar, TimeSync, 121) as TimeSync,
+	TimeSync,
 	'C' as Operation,
 	[PurchaseOrderNo],[LineKey],[ItemCode],[Quantity],[Comment]
   FROM #temp_PortalSampleOrderDetail_Current
@@ -211,7 +211,7 @@ WHERE    ((@AccountType = 'REP' and pa.Rep = @RepCode) or (@AccountType = 'OFF')
 SELECT @TimeSyncAddressPrev = MAX(TimeSync) FROM PortalSampleAddresses_Previous where RepCode=@RepCode
 
 SELECT
-	CONVERT(varchar, TimeSync, 121) as TimeSync,
+	TimeSync,
 	'C' as Operation,
 	[RepCode],[ShipToCode],ShipToRep,ShipToName,ShipToAddress,RepRegion,isUser,isActive
   INTO #temp_PortalSampleAddresses
@@ -222,7 +222,7 @@ IF(@TimeSyncAddressPrev = @TimeSyncAddress)
 BEGIN
 	INSERT INTO #temp_PortalSampleAddresses
 	SELECT
-	CONVERT(varchar, @CurrentDate , 121) as TimeSync,
+	@CurrentDate as TimeSync,
 	MIN(Operation) as Operation,
 	[RepCode],
 	[ShipToCode],
@@ -254,7 +254,7 @@ ELSE
 BEGIN
 INSERT INTO #temp_PortalSampleAddresses
  SELECT
-	CONVERT(varchar, TimeSync, 121) as TimeSync,
+	TimeSync,
 	'C' as Operation,
 	[RepCode],[ShipToCode],ShipToRep,ShipToName,ShipToAddress,RepRegion,isUser,isActive
   FROM #temp_PortalSampleAddresses_Current
@@ -339,7 +339,7 @@ END
 SELECT @TimeSyncItemsPrev = MAX(TimeSync) FROM PortalInactiveSampleItems_Previous where RepCode=@RepCode
 
 SELECT
-	CONVERT(varchar, TimeSync, 121) as TimeSync,
+	TimeSync,
 	'C' as Operation,
 	[ItemCode],[Brand],[Description],[Vintage],[Uom],[BottleSize],[DamagedNotes],[SampleFocus],Region, MasterVendor, Country, Appellation
   INTO #temp_PortalInactiveSampleItems
@@ -350,7 +350,7 @@ IF(@TimeSyncItemsPrev = @TimeSyncItems)
 BEGIN
 	INSERT INTO #temp_PortalInactiveSampleItems
 	SELECT
-	CONVERT(varchar, @CurrentDate , 121) as TimeSync,
+	@CurrentDate as TimeSync,
 	MIN(Operation) as Operation,
 	[ItemCode],
 	CASE WHEN MIN(Operation)<>'D' THEN [Brand] ELSE '' END AS Brand,
@@ -385,7 +385,7 @@ ELSE
 BEGIN
  INSERT INTO #temp_PortalInactiveSampleItems
  SELECT
-	CONVERT(varchar, TimeSync, 121) as TimeSync,
+	TimeSync,
 	'C' as Operation,
 	[ItemCode],[Brand],[Description],[Vintage],[Uom],[BottleSize],[DamagedNotes],[SampleFocus],Region, MasterVendor, Country, Appellation
   FROM #temp_PortalInactiveSampleItems_Current
@@ -403,18 +403,18 @@ FROM #temp_PortalInactiveSampleItems_Current
 WHERE RepCode = @RepCode
 END
 
-SELECT H = ISNULL(JSON_QUERY((SELECT TOP(1) TimeSync
+SELECT H = ISNULL(JSON_QUERY((SELECT TOP(1) CONVERT(varchar, TimeSync, 121) as TimeSync
 	, Op = CASE WHEN NOT EXISTS(SELECT PurchaseOrderNo FROM #temp_PortalSampleOrderHeader) THEN 'E' WHEN Operation = 'C' THEN 'C' ELSE 'U' END
 	, D = ISNULL((SELECT PurchaseOrderNo as OrderNo FROM #temp_PortalSampleOrderHeader WHERE Operation = 'D' FOR JSON PATH),'[]')
 	, A = ISNULL((SELECT PurchaseOrderNo as OrderNo
 			, OrderRep as Rep
 			, ShipToCode as ShipTo
-			, Date
+			, CONVERT(varchar, [Date], 12) as Date
 			, isPosted
 		FROM #temp_PortalSampleOrderHeader WHERE Operation !='D' FOR JSON PATH),'[]')
 	FROM #temp_PortalSampleOrderHeader
 	FOR JSON PATH, WITHOUT_ARRAY_WRAPPER)), '{"Op": "E"}')
-	, D = ISNULL(JSON_QUERY((SELECT TOP(1) TimeSync
+	, D = ISNULL(JSON_QUERY((SELECT TOP(1) CONVERT(varchar, TimeSync, 121) as TimeSync
 	, Op = CASE WHEN NOT EXISTS(SELECT PurchaseOrderNo FROM #temp_PortalSampleOrderDetail) THEN 'E' WHEN Operation = 'C' THEN 'C' ELSE 'U' END
 	, D = ISNULL((SELECT PurchaseOrderNo as OrderNo, LineKey as Line FROM #temp_PortalSampleOrderDetail WHERE Operation = 'D' FOR JSON PATH),'[]')
 	, A = ISNULL((SELECT PurchaseOrderNo as OrderNo
@@ -425,7 +425,7 @@ SELECT H = ISNULL(JSON_QUERY((SELECT TOP(1) TimeSync
 		FROM #temp_PortalSampleOrderDetail WHERE Operation !='D' FOR JSON PATH),'[]')
 	FROM #temp_PortalSampleOrderDetail
 	FOR JSON PATH, WITHOUT_ARRAY_WRAPPER)), '{"Op": "E"}')
-	, A = ISNULL(JSON_QUERY((SELECT TOP(1) TimeSync
+	, A = ISNULL(JSON_QUERY((SELECT TOP(1) CONVERT(varchar, TimeSync, 121) as TimeSync
 	, Op = CASE WHEN NOT EXISTS(SELECT ShipToCode FROM #temp_PortalSampleAddresses) THEN 'E' WHEN Operation = 'C' THEN 'C' ELSE 'U' END
 	, D = ISNULL((SELECT ShipToCode as Code FROM #temp_PortalSampleAddresses WHERE Operation = 'D' FOR JSON PATH),'[]')
 	, A = ISNULL((SELECT ShipToCode as Code 
@@ -437,6 +437,24 @@ SELECT H = ISNULL(JSON_QUERY((SELECT TOP(1) TimeSync
 			, isActive as isAct
 		FROM #temp_PortalSampleAddresses WHERE Operation !='D' FOR JSON PATH),'[]')
 	FROM #temp_PortalSampleAddresses
+	FOR JSON PATH, WITHOUT_ARRAY_WRAPPER)), '{"Op": "E"}')
+	, I = ISNULL(JSON_QUERY((SELECT TOP(1) CONVERT(varchar, TimeSync, 121) as TimeSync
+	, Op = CASE WHEN NOT EXISTS(SELECT ItemCode FROM #temp_PortalInactiveSampleItems) THEN 'E' WHEN Operation = 'C' THEN 'C' ELSE 'U' END
+	, D = ISNULL((SELECT ItemCode as Code FROM #temp_PortalInactiveSampleItems WHERE Operation = 'D' FOR JSON PATH),'[]')
+	, A = ISNULL((SELECT ItemCode as Code 
+			, Replace(Description,'''', '''''') as [Desc]
+			, Replace(Brand,'''', '''''') as Brand
+			, Replace(MasterVendor,'''', '''''') as MVendor
+			, Vintage
+			, Uom
+			, BottleSize as Size
+			, Replace(DamagedNotes,'''', '''''') as DamNotes
+			, SampleFocus as Focus
+			, Country
+			, Replace(Region,'''', '''''') as Region
+			, Trim(Replace(Appellation,'''', '''''')) as App
+		FROM #temp_PortalInactiveSampleItems WHERE Operation !='D' FOR JSON PATH),'[]')
+	FROM #temp_PortalInactiveSampleItems
 	FOR JSON PATH, WITHOUT_ARRAY_WRAPPER)), '{"Op": "E"}')
 	FOR JSON PATH, WITHOUT_ARRAY_WRAPPER
 
