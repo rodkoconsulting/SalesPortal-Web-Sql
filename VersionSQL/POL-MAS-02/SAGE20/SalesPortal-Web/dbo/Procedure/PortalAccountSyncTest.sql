@@ -1,6 +1,6 @@
-﻿/****** Object:  Procedure [dbo].[PortalAccountSync]    Committed by VersionSQL https://www.versionsql.com ******/
+﻿/****** Object:  Procedure [dbo].[PortalAccountSyncTest]    Committed by VersionSQL https://www.versionsql.com ******/
 
-CREATE PROCEDURE [dbo].[PortalAccountSync]
+CREATE PROCEDURE [dbo].[PortalAccountSyncTest]
 	@UserName varchar(25),
 	@SyncTime varchar(100)
 AS
@@ -194,69 +194,14 @@ FROM         MAS_POL.dbo.AR_InvoiceHistoryHeader h INNER JOIN
                       h.CustomerNo = c.CustomerNo
 WHERE     (h.InvoiceDate >= DATEADD(YEAR, - 1, @CurrentDate)) AND (h.ModuleCode = 'S/O') 
 and ((@AccountType = 'REP' and c.SalespersonNo = @RepCode) or (@AccountType = 'OFF' and c.SalespersonNo not like 'XX%'))
+END
 
 SELECT @TimeSyncHeaderPrev = MAX(TimeSync) FROM PortalInvoiceHistoryHeader_Previous where RepCode=@RepCode
 
 SELECT
 	TimeSync,
 	'C' as Operation,
-	[InvoiceNo], [HSeqNo],[ARDivisionNo],[CustomerNo],[InvoiceType],[InvoiceDate],[Comment]
+	[ARDivisionNo],[CustomerNo],[CustomerName],[PriceLevel],[ShipDays],[CoopList],[Buyer1],[Buyer2],[Buyer3],[Buyer1Phone],[Buyer2Phone],[Buyer3Phone],[Buyer1Email],[Buyer2Email],[Buyer3Email],[Affil],[Addr1],[Addr2],[City],[State],[Zip],[Status],[Rep],[Region],PrimaryShipTo,ShipVia
   INTO #temp_PortalInvoiceHistoryHeader
   FROM #temp_PortalInvoiceHistoryHeader_Current
   WHERE 1=2
-
-IF(@TimeSyncHeaderPrev = @TimeSyncHeader)
-BEGIN
-	INSERT INTO #temp_PortalInvoiceHistoryHeader
-	SELECT
-	TimeSync,
-	MIN(Operation) as Operation,
-	[InvoiceNo],
-	right(HSeqNo,1) as HSeqNo,
-	CASE WHEN MIN(Operation)<>'D' THEN [ARDivisionNo] ELSE '' END AS ARDivisionNo,
-	CASE WHEN MIN(Operation)<>'D' THEN [CustomerNo] ELSE '' END AS CustomerNo,
-	CASE WHEN MIN(Operation)<>'D' THEN [InvoiceType] ELSE '' END AS InvoiceType,
-	CASE WHEN MIN(Operation)<>'D' THEN [InvoiceDate] ELSE '' END AS InvoiceDate,
-	CASE WHEN MIN(Operation)<>'D' THEN [Comment] ELSE '' END AS Comment
-FROM
-(
-  SELECT 'D' as Operation, [InvoiceNo],[HSeqNo],[ARDivisionNo],[CustomerNo],[InvoiceType],[InvoiceDate],[Comment]
-  FROM dbo.PortalInvoiceHistoryHeader_Previous
-  WHERE [RepCode] = @RepCode
-  UNION ALL
-  SELECT 'I' as Operation, [InvoiceNo],[HSeqNo],[ARDivisionNo],[CustomerNo],[InvoiceType],[InvoiceDate],[Comment]
-  FROM #temp_PortalInvoiceHistoryHeader_Current
-  WHERE [RepCode] = @RepCode
-) tmp
- 
-GROUP BY [InvoiceNo],[HSeqNo],[ARDivisionNo],[CustomerNo],[InvoiceType],[InvoiceDate],[Comment]
-   
-HAVING COUNT(*) = 1
- 
-ORDER BY  [InvoiceNo],[HSeqNo]
-
-END
-ELSE
-BEGIN
- INSERT INTO #temp_PortalInvoiceHistoryHeader
- SELECT
-	TimeSync,
-	'C' as Operation,
-	[InvoiceNo], [HSeqNo],[ARDivisionNo],[CustomerNo],[InvoiceType],[InvoiceDate],[Comment]
-  FROM #temp_PortalInvoiceHistoryHeader_Current
-  WHERE RepCode = @RepCode
-END
-if @@ROWCOUNT>0
-BEGIN
-DELETE FROM PortalInvoiceHistoryHeader_Previous where RepCode = @RepCode
-INSERT PortalInvoiceHistoryHeader_Previous(TimeSync, RepCode,[InvoiceNo],[HSeqNo],[ARDivisionNo],[CustomerNo],[InvoiceType],[InvoiceDate],[Comment])
-SELECT
-	TimeSync,
-	RepCode,
-	[InvoiceNo], HSeqNo as HeaderSeqNo,[ARDivisionNo],[CustomerNo],[InvoiceType],[InvoiceDate],[Comment]
-FROM #temp_PortalInvoiceHistoryHeader_Current
-WHERE RepCode = @RepCode
-END
-
-
-END

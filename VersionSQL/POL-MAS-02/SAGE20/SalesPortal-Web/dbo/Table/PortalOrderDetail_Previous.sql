@@ -8,9 +8,9 @@ CREATE TABLE [dbo].[PortalOrderDetail_Previous](
 	[SalesOrderNo] [varchar](7) NOT NULL,
 	[LineKey] [varchar](3) NOT NULL,
 	[ItemCode] [varchar](30) NULL,
-	[Quantity] [float] NOT NULL,
-	[Price] [float] NOT NULL,
-	[Total] [float] NOT NULL,
+	[Quantity] [decimal](15, 6) NOT NULL,
+	[Price] [decimal](15, 6) NOT NULL,
+	[Total] [decimal](11, 2) NOT NULL,
 	[Comment] [varchar](2048) NULL,
  CONSTRAINT [PK__PortalOrderDetailPrevious] PRIMARY KEY CLUSTERED 
 (

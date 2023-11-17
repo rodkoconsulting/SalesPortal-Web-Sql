@@ -126,7 +126,7 @@ SELECT     @CurrentDate as TimeSync,
 		   left(h.PurchaseOrderNo,7) as PurchaseOrderNo,
 		   right(LineKey,3) as LineKey,
 		   left(ItemCode,30) as ItemCode,
-		   CAST(ROUND(QuantityOrdered,2) AS FLOAT) as Quantity,  
+		   QuantityOrdered as Quantity,  
 		   LEFT(d.CommentText,2048) as Comment
 INTO #temp_PortalSampleOrderDetail_Current
 FROM         MAS_POL.dbo.PO_PurchaseOrderDetail d INNER JOIN
@@ -420,7 +420,7 @@ SELECT H = ISNULL(JSON_QUERY((SELECT TOP(1) CONVERT(varchar, TimeSync, 121) as T
 	, A = ISNULL((SELECT PurchaseOrderNo as OrderNo
 			, LineKey as Line
 			, ItemCode as Item
-			, CONVERT(numeric(5,2),ROUND(Quantity,2)) as Qty
+			, CONVERT(decimal(6,2), ROUND(Quantity,2)) as Qty
 			, Replace(Comment,'''', '''''') as Cmt
 		FROM #temp_PortalSampleOrderDetail WHERE Operation !='D' FOR JSON PATH),'[]')
 	FROM #temp_PortalSampleOrderDetail

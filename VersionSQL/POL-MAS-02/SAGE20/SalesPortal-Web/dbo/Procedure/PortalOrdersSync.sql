@@ -100,15 +100,15 @@ WHERE h.OrderType = 'X' AND h.OrderStatus <> 'X' AND h.RequiredExpireDate > GETD
 
 SELECT @TimeSyncHeaderPrev = MAX(TimeSync) FROM PortalOrderHeader_Previous where RepCode=@RepCode
 SELECT
-	CONVERT(varchar, TimeSync, 121) as TimeSync,
+	TimeSync,
 	'C' as
 	 Operation
 	 ,[SalesOrderNo]
 	 ,[ARDivisionNo]
 	 ,[CustomerNo]
-	 ,CONVERT(varchar, [OrderDate], 12) as 'OrderDate'
-	 ,CONVERT(varchar, [ShipExpireDate], 12) as 'ShipExpireDate'
-	 ,IsNull(CONVERT(varchar, [ArrivalDate], 12),'') as 'ArrivalDate'
+	 ,[OrderDate]
+	 ,[ShipExpireDate]
+	 ,[ArrivalDate]
 	 ,[OrderStatus]
 	 ,[HoldCode]
 	 ,[CoopNo]
@@ -121,14 +121,14 @@ IF(@TimeSyncHeaderPrev = @TimeSyncHeader)
 BEGIN
 INSERT INTO #temp_PortalOrderHeader
 	SELECT
-		CONVERT(varchar, @CurrentDate , 121) as TimeSync,
+		@CurrentDate,
 		MIN(Operation) as Operation,
 		[SalesOrderNo],
 		CASE WHEN MIN(Operation)<>'D' THEN [ARDivisionNo] ELSE '' END AS ARDivisionNo,
 		CASE WHEN MIN(Operation)<>'D' THEN [CustomerNo] ELSE '' END AS CustomerNo,
-		CASE WHEN MIN(Operation)<>'D' THEN CONVERT(varchar, [OrderDate], 12) ELSE '' END AS OrderDate,
-		CASE WHEN MIN(Operation)<>'D' THEN CONVERT(varchar, [ShipExpireDate], 12) ELSE '' END AS ShipExpireDate,
-		CASE WHEN MIN(Operation)<>'D' THEN IsNull(CONVERT(varchar, [ArrivalDate], 12),'') ELSE '' END AS ArrivalDate,
+		CASE WHEN MIN(Operation)<>'D' THEN [OrderDate] ELSE '' END AS OrderDate,
+		CASE WHEN MIN(Operation)<>'D' THEN [ShipExpireDate] ELSE '' END AS ShipExpireDate,
+		CASE WHEN MIN(Operation)<>'D' THEN [ArrivalDate] ELSE '' END AS ArrivalDate,
 		CASE WHEN MIN(Operation)<>'D' THEN [OrderStatus] ELSE '' END AS OrderStatus,
 		CASE WHEN MIN(Operation)<>'D' THEN [HoldCode] ELSE '' END AS HoldCode,
 		CASE WHEN MIN(Operation)<>'D' THEN [CoopNo] ELSE '' END AS CoopNo,
@@ -156,15 +156,15 @@ ELSE
 BEGIN 
 INSERT INTO #temp_PortalOrderHeader
  SELECT
-	CONVERT(varchar, TimeSync, 121) as TimeSync,
+	TimeSync,
 	'C' as
 	 Operation
 	 ,[SalesOrderNo]
 	 ,[ARDivisionNo]
 	 ,[CustomerNo]
-	 ,CONVERT(varchar, [OrderDate], 12) as 'OrderDate'
-	 ,CONVERT(varchar, [ShipExpireDate], 12) as 'ShipExpireDate'
-	 ,IsNull(CONVERT(varchar, [ArrivalDate], 12),'') as 'ArrivalDate'
+	 ,[OrderDate]
+	 ,[ShipExpireDate]
+	 ,[ArrivalDate]
 	 ,[OrderStatus]
 	 ,[HoldCode]conver
 	 ,[CoopNo]
@@ -190,9 +190,9 @@ SELECT     @CurrentDate as TimeSync,
 		   left(h.InvoiceNo,7) as SalesOrderNo,
 		   right(LineKey,3) as LineKey,
 		   left(ItemCode,30) as ItemCode,
-		   CONVERT(decimal(6,2),ROUND(QuantityOrdered,2)) as Quantity,
-		   CONVERT(decimal(7,2),UnitPrice) as Price,
-		   CONVERT(decimal(7,2),ExtensionAmt) as Total,
+		   QuantityOrdered as Quantity,
+		   UnitPrice as Price,
+		   ExtensionAmt as Total,
 		   left(CommentText,2048) as Comment
 INTO #temp_PortalOrderDetail_Current
 FROM         MAS_POL.dbo.SO_InvoiceDetail d INNER JOIN
@@ -204,9 +204,9 @@ SELECT     @CurrentDate as TimeSync,
 		   left(h.SalesOrderNo,7) as SalesOrderNo,
 		   right(LineKey,3) as LineKey,
 		   left(ItemCode,30) as ItemCode,
-		   CONVERT(decimal(6,2),ROUND(QuantityOrdered,2)) as Quantity,
-		   CONVERT(decimal(7,2),UnitPrice) as Price,
-		   CONVERT(decimal(7,2),ExtensionAmt) as Total,
+		   QuantityOrdered as Quantity,
+		   UnitPrice as Price,
+		   ExtensionAmt as Total,
 		   left(CommentText,2048) as Comment
 FROM         MAS_POL.dbo.SO_SalesOrderDetail d INNER JOIN
                       MAS_POL.dbo.SO_SalesOrderHeader h ON d.SalesOrderNo = h.SalesOrderNo
@@ -217,21 +217,21 @@ SELECT     @CurrentDate as TimeSync,
 		   left(h.InvoiceNo,7) as SalesOrderNo,
 		   right(DetailSeqNo,3) as LineKey,
 		   left(ItemCode,30) as ItemCode,
-		   CONVERT(decimal(6,2),ROUND(QuantityShipped,2)) as Quantity,
-		   CONVERT(decimal(7,2),UnitPrice) as Price,
-		   CONVERT(decimal(7,2),ExtensionAmt) as Total,
+		   QuantityShipped as Quantity,
+		   UnitPrice as Price,
+		   ExtensionAmt as Total,
 		   left(CommentText,2048) as Comment
 FROM         MAS_POL.dbo.AR_InvoiceHistoryDetail d INNER JOIN
                       MAS_POL.dbo.AR_InvoiceHistoryHeader h ON d.InvoiceNo = h.InvoiceNo and
 					  h.HeaderSeqNo = d.HeaderSeqNo
-WHERE    InvoiceDate > GETDATE() and ItemCode != '/COBRA' and ((@AccountType = 'REP' and SalespersonNo = @RepCode) or (@AccountType = 'OFF' and SalespersonNo not like 'XX%'))
+WHERE    InvoiceDate > @CurrentDate and ItemCode != '/COBRA' and ((@AccountType = 'REP' and SalespersonNo = @RepCode) or (@AccountType = 'OFF' and SalespersonNo not like 'XX%'))
 UNION ALL
 SELECT     @CurrentDate as TimeSync,
 		   @RepCode as RepCode,
 		   left(h.PurchaseOrderNo,7) as SalesOrderNo,
 		   right(LineKey,3) as LineKey,
 		   left(ItemCode,30) as ItemCode,
-		   CONVERT(decimal(6,2),QuantityOrdered) as Quantity,
+		   QuantityOrdered as Quantity,
 		   0.0 as Price,
 		   0.0 as Total,
 		   left(CommentText,2048) as Comment                   
@@ -243,7 +243,7 @@ WHERE h.OrderType = 'X' AND h.OrderStatus <> 'X' AND ((@AccountType = 'REP' and 
 SELECT @TimeSyncDetailsPrev = MAX(TimeSync) FROM PortalOrderDetail_Previous where RepCode=@RepCode
 
 SELECT
-	CONVERT(varchar, TimeSync, 121) as TimeSync,
+	TimeSync,
 	'C' as Operation,
 	[SalesOrderNo],[LineKey],[ItemCode],[Quantity],[Price],[Total],[Comment]
   INTO #temp_PortalOrderDetail
@@ -253,7 +253,7 @@ IF(@TimeSyncDetailsPrev = @TimeSyncDetails)
 BEGIN
 	INSERT INTO #temp_PortalOrderDetail
 	SELECT
-	CONVERT(varchar, @CurrentDate , 121) as TimeSync,
+	@CurrentDate as TimeSync,
 	MIN(Operation) as Operation,
 	[SalesOrderNo],
 	[LineKey],
@@ -284,7 +284,7 @@ ELSE
 BEGIN
  INSERT INTO #temp_PortalOrderDetail
  SELECT
-	CONVERT(varchar, TimeSync, 121) as TimeSync,
+	TimeSync,
 	'C' as Operation,
 	[SalesOrderNo],[LineKey],[ItemCode],[Quantity],[Price],[Total],[Comment]
   FROM #temp_PortalOrderDetail_Current
@@ -303,15 +303,15 @@ WHERE RepCode = @RepCode
 END
 
 
-SELECT H = ISNULL(JSON_QUERY((SELECT TOP(1) TimeSync
+SELECT H = ISNULL(JSON_QUERY((SELECT TOP(1) CONVERT(varchar, TimeSync, 121) as TimeSync
 	, Op = CASE WHEN NOT EXISTS(SELECT SalesOrderNo FROM #temp_PortalOrderHeader) THEN 'E' WHEN Operation = 'C' THEN 'C' ELSE 'U' END
 	, D = ISNULL((SELECT SalesOrderNo as OrderNo FROM #temp_PortalOrderHeader WHERE Operation = 'D' FOR JSON PATH),'[]')
 	, A = ISNULL((SELECT SalesOrderNo as OrderNo
 			, ARDivisionNo as Div
 			, CustomerNo as CustNo
-			, OrderDate as OrderDate
-			, ShipExpireDate as ShipDate
-			, ArrivalDate as ArrDate
+			, CONVERT(varchar, [OrderDate], 12) as OrderDate
+			, CONVERT(varchar, [ShipExpireDate], 12) as ShipDate
+			, IsNull(CONVERT(varchar, [ArrivalDate], 12),'')  as ArrDate
 			, OrderStatus as Status
 			, HoldCode as Hold
 			, CoopNo as Coop
@@ -320,15 +320,15 @@ SELECT H = ISNULL(JSON_QUERY((SELECT TOP(1) TimeSync
 		FROM #temp_PortalOrderHeader WHERE Operation !='D' FOR JSON PATH),'[]')
 	FROM #temp_PortalOrderHeader
 	FOR JSON PATH, WITHOUT_ARRAY_WRAPPER)), '{"Op": "E"}')
-	, D = ISNULL(JSON_QUERY((SELECT TOP(1) TimeSync
+	, D = ISNULL(JSON_QUERY((SELECT TOP(1) CONVERT(varchar, TimeSync, 121) as TimeSync
 	, Op = CASE WHEN NOT EXISTS(SELECT SalesOrderNo FROM #temp_PortalOrderDetail) THEN 'E' WHEN Operation = 'C' THEN 'C' ELSE 'U' END
 	, D = ISNULL((SELECT SalesOrderNo as OrderNo, LineKey as Line FROM #temp_PortalOrderDetail WHERE Operation = 'D' FOR JSON PATH),'[]')
 	, A = ISNULL((SELECT SalesOrderNo as OrderNo
 			, LineKey as Line
 			, ItemCode as Item
-			, Quantity as Qty
-			, Price as Price
-			, Total as Total
+			, CONVERT(decimal(6,2),ROUND(Quantity,2)) as Qty
+		    , CONVERT(decimal(7,2),Price) as Price
+		    , CONVERT(decimal(7,2),Total) as Total
 			, Replace(Comment,'''', '''''') as Cmt
 		FROM #temp_PortalOrderDetail WHERE Operation !='D' FOR JSON PATH),'[]')
 	FROM #temp_PortalOrderDetail
