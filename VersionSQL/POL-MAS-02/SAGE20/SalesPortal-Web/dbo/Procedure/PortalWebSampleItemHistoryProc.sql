@@ -1,6 +1,6 @@
 ﻿/****** Object:  Procedure [dbo].[PortalWebSampleItemHistoryProc]    Committed by VersionSQL https://www.versionsql.com ******/
 
-CREATE PROCEDURE [dbo].[PortalWebSamplesItemHistory]
+CREATE PROCEDURE [dbo].[PortalWebSampleItemHistoryProc]
 	-- Add the parameters for the stored procedure here
 	@UserName varchar(25)
 AS
@@ -23,7 +23,7 @@ HAVING SUM(Qty) > 0
 )
 SELECT Main= (SELECT
 	Code
-	, Date
+	, SUBSTRING(Date,3,2)+SUBSTRING(Date,6,2)+SUBSTRING(Date,9,2) as Date
 	, Qty
 FROM ItemHistory
 WHERE RN=1
