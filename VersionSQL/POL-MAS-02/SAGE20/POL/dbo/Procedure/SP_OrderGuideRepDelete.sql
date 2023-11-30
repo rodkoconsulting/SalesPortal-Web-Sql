@@ -8,6 +8,7 @@ BEGIN
   FROM [POL].[dbo].[SP_OrderGuideReps]
   where salespersonno =@SalesPersonNo)
 delete from [pol].[dbo].Web_UserMappings where repcode=@SalesPersonNo
+delete from [SalesPortal-Web].[dbo].Users where repcode=@SalesPersonNo
 delete from [pol].dbo.PortalAccountAddresses_Previous where repcode=@SalesPersonNo
 delete from [pol].dbo.PortalAccountItemHistory_Previous where repcode=@SalesPersonNo
 delete from [pol].dbo.PortalAccountList_Previous where repcode=@SalesPersonNo
@@ -46,5 +47,13 @@ delete from [pol].dbo.PortalSampleOrderHeader_Current where repcode=@SalesPerson
 delete from [pol].dbo.PortalOrderDetail_Current where repcode=@SalesPersonNo
 delete from [pol].dbo.PortalOrderDetail_Current where repcode=@SalesPersonNo
 delete from [pol].dbo.PortalOrderDetail_Current where repcode=@SalesPersonNo
-
+delete from [SalesPortal-Web].dbo.PortalAccountList_Previous where repcode=@SalesPersonNo
+delete from [SalesPortal-Web].dbo.PortalInactiveSampleItems_Previous where repcode=@SalesPersonNo
+delete from [SalesPortal-Web].dbo.PortalInvoiceHistoryDetail_Previous where repcode=@SalesPersonNo
+delete from [SalesPortal-Web].dbo.PortalInvoiceHistoryHeader_Previous where repcode=@SalesPersonNo
+delete from [SalesPortal-Web].dbo.PortalOrderDetail_Previous where repcode=@SalesPersonNo
+delete from [SalesPortal-Web].dbo.PortalOrderHeader_Previous where repcode=@SalesPersonNo
+delete from [SalesPortal-Web].dbo.PortalSampleAddresses_Previous where repcode=@SalesPersonNo
+delete from [SalesPortal-Web].dbo.PortalSampleOrderDetail_Previous where repcode=@SalesPersonNo
+delete from [SalesPortal-Web].dbo.PortalSampleOrderHeader_Previous where repcode=@SalesPersonNo
 END
