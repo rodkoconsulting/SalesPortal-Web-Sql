@@ -268,6 +268,7 @@ SELECT Main = (SELECT
 				, CASE WHEN i.UDF_VEGAN = 'Y' THEN 'Y' ELSE '' END AS Veg
 				, CASE WHEN i.UDF_HAUTE_VALEUR = 'Y' THEN 'Y' ELSE '' END AS Hve
 				, CASE WHEN YEAR(LastReceiptDate)>1900 THEN CONVERT(varchar,LastReceiptDate,23) ELSE '' END as Rcpt
+				, UDF_ALCOHOL_PCT AS Abv
 FROM 
 MAS_POL.dbo.CI_ITEM i
 	INNER JOIN MAS_POL.dbo.IM_ItemWarehouse w on w.ItemCode = i.ItemCode
