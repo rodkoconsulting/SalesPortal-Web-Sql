@@ -99,6 +99,7 @@ WHERE (PriceLevel <> '') and ((AR_CUSTOMER.ARDIVISIONNO = '00') or (AR_CUSTOMER.
 		,CAST(Quantity AS FLOAT) AS Quantity
 		,CAST(MoboTotal AS FLOAT) AS 'MoboQty'
 		,MoboList
+		,ISNULL(d.Comment,'') AS Comment
 		,a.PoRequired as 'AcctPo'
 		,a.Balance as 'AcctBal'
 		,a.License as 'AcctLic'
