@@ -8,6 +8,7 @@ CREATE TABLE [dbo].[PortalWebSavedDetails](
 	[MoboList] [varchar](40) NULL,
 	[Quantity] [decimal](9, 5) NOT NULL,
 	[MoboTotal] [decimal](9, 5) NOT NULL,
+	[Comment] [varchar](100) NULL,
  CONSTRAINT [PK_PortalWebSavedDetails] PRIMARY KEY CLUSTERED 
 (
 	[ORDERNO] ASC,
