@@ -6,13 +6,14 @@ CREATE PROCEDURE [dbo].[PortalWebSavedDetailsCreate]
 	@ItemCode varchar(15),
 	@MoboList varchar(40),
 	@Bottles decimal(9,5),
-	@MoboTotal decimal(9,5)
+	@MoboTotal decimal(9,5),
+	@Comment varchar(100) = ''
 AS
 BEGIN
 	BEGIN TRY
     BEGIN TRAN
-	INSERT INTO dbo.PortalWebSavedDetails(ORDERNO,ITEMCODE,MoboList,Quantity,MoboTotal)
-	VALUES(@OrderNo,@ItemCode,@MoboList,@Bottles,@MoboTotal)
+	INSERT INTO dbo.PortalWebSavedDetails(ORDERNO,ITEMCODE,MoboList,Quantity,MoboTotal,Comment)
+	VALUES(@OrderNo,@ItemCode,@MoboList,@Bottles,@MoboTotal,@Comment)
 	COMMIT TRAN
 	SELECT 1
 	END TRY
