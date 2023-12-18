@@ -1,6 +1,6 @@
 ﻿/****** Object:  Procedure [dbo].[PortalOrderHeaderCreate_v2]    Committed by VersionSQL https://www.versionsql.com ******/
 
-CREATE PROCEDURE [dbo].[PortalOrderHeaderCreate_v2]
+CREATE PROCEDURE dbo.PortalOrderHeaderCreate_v2
 	-- Add the parameters for the stored procedure here
 	@Customer varchar(9),
 	@OrderType varchar(3),
@@ -52,7 +52,7 @@ BEGIN
 			INSERT INTO dbo.PortalOrderTransmitHeader(STATUS,ORDERTYPE,CUSTOMERNO,DIVISIONNO,DELIVERYDAY,NOTES,PONO,COOPNO,SHIPTO,USERCODE,OrderId)
 			VALUES('N',@OrderType,@Customer,@DivisionNo, @Date,@Notes,@Po,@Coop,@ShipTo,@UserCode,@Id)
 			SET @OrderNo = CAST(SCOPE_IDENTITY() AS INT)
-			IF @Id <> ''
+			IF TRIM(@Id) <> ''
 				BEGIN
 					INSERT INTO dbo.PortalExportLog(Date, Id, Customer)
 					VALUES(GETDATE(), @Id, @Customer)

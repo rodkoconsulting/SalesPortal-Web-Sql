@@ -1,12 +1,11 @@
-﻿/****** Object:  Table [dbo].[PortalWebSavedDetails]    Committed by VersionSQL https://www.versionsql.com ******/
+﻿/****** Object:  Table [dbo].[PortalWebSampleSavedDetails]    Committed by VersionSQL https://www.versionsql.com ******/
 
-CREATE TABLE dbo.PortalWebSavedDetails(
+CREATE TABLE dbo.PortalWebSampleSavedDetails(
 	[ORDERNO] [bigint] NOT NULL,
 	[ITEMCODE] [varchar](15) NOT NULL,
-	[MoboList] [varchar](40) NULL,
 	[Quantity] [decimal](9, 5) NOT NULL,
-	[MoboTotal] [decimal](9, 5) NOT NULL,
- CONSTRAINT [PK_PortalWebSavedDetails] PRIMARY KEY CLUSTERED 
+	[Comment] [varchar](100) NULL,
+ CONSTRAINT [PK_PortalWebSampleSavedDetails] PRIMARY KEY CLUSTERED 
 (
 	[ORDERNO] ASC,
 	[ITEMCODE] ASC

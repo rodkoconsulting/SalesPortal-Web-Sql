@@ -1,19 +1,18 @@
 ﻿/****** Object:  Procedure [dbo].[PortalWebSavedDetailsCreate]    Committed by VersionSQL https://www.versionsql.com ******/
 
-CREATE PROCEDURE [dbo].[PortalWebSavedDetailsCreate]
+CREATE PROCEDURE dbo.PortalWebSavedDetailsCreate
 	-- Add the parameters for the stored procedure here
 	@OrderNo bigint,
 	@ItemCode varchar(15),
 	@MoboList varchar(40),
 	@Bottles decimal(9,5),
-	@MoboTotal decimal(9,5),
-	@Comment varchar(100) = ''
+	@MoboTotal decimal(9,5)
 AS
 BEGIN
 	BEGIN TRY
     BEGIN TRAN
-	INSERT INTO dbo.PortalWebSavedDetails(ORDERNO,ITEMCODE,MoboList,Quantity,MoboTotal,Comment)
-	VALUES(@OrderNo,@ItemCode,@MoboList,@Bottles,@MoboTotal,@Comment)
+	INSERT INTO dbo.PortalWebSavedDetails(ORDERNO,ITEMCODE,MoboList,Quantity,MoboTotal)
+	VALUES(@OrderNo,@ItemCode,@MoboList,@Bottles,@MoboTotal)
 	COMMIT TRAN
 	SELECT 1
 	END TRY

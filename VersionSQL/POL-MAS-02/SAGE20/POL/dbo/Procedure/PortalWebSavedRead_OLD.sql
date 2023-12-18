@@ -1,11 +1,11 @@
-﻿/****** Object:  Procedure [dbo].[PortalWebSavedRead]    Committed by VersionSQL https://www.versionsql.com ******/
+﻿/****** Object:  Procedure [dbo].[PortalWebSavedRead_OLD]    Committed by VersionSQL https://www.versionsql.com ******/
 
 -- =============================================
 -- Author:		<Author,,Name>
 -- Create date: <Create Date,,>
 -- Description:	<Description,,>
 -- =============================================
-CREATE PROCEDURE dbo.PortalWebSavedRead 
+CREATE PROCEDURE dbo.PortalWebSavedRead_OLD 
 	-- Add the parameters for the stored procedure here
 	@UserName varchar(15)
 AS
@@ -99,6 +99,7 @@ WHERE (PriceLevel <> '') and ((AR_CUSTOMER.ARDIVISIONNO = '00') or (AR_CUSTOMER.
 		,CAST(Quantity AS FLOAT) AS Quantity
 		,CAST(MoboTotal AS FLOAT) AS 'MoboQty'
 		,MoboList
+		,ISNULL(d.Comment,'') AS Comment
 		,a.PoRequired as 'AcctPo'
 		,a.Balance as 'AcctBal'
 		,a.License as 'AcctLic'
