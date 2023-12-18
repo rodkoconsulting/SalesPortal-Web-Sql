@@ -1,6 +1,6 @@
 ﻿/****** Object:  Procedure [dbo].[PortalWebSamplesProc]    Committed by VersionSQL https://www.versionsql.com ******/
 
-CREATE PROCEDURE [dbo].[PortalWebSamplesProc]
+CREATE PROCEDURE dbo.PortalWebSamplesProc
 	-- Add the parameters for the stored procedure here
 	@UserName varchar(25)
 AS
@@ -27,6 +27,7 @@ CASE WHEN @AccountType = 'OFF' THEN h.RepNo ELSE '' END as RepNo
       ,h.ShpTo
       ,Det.Code
       ,Det.Qty
+	  ,Det.Cost
   FROM [dbo].[PortalWebSamplesMain] h INNER JOIN
   [dbo].[PortalWebSamplesDet] Det on h.PoNo = Det.PoNo
 where (@AccountType = 'REP' and h.RepNo = @RepCode) or (@AccountType = 'OFF')
