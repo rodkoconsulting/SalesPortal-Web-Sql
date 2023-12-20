@@ -1,6 +1,6 @@
 ﻿/****** Object:  View [dbo].[PortalWebOrdersDet]    Committed by VersionSQL https://www.versionsql.com ******/
 
-CREATE VIEW [dbo].[PortalWebOrdersDet]
+CREATE VIEW dbo.PortalWebOrdersDet
 AS
 WITH Po AS
 (
@@ -13,6 +13,7 @@ WITH Po AS
 			,d.ItemCode
 			,d.ItemCodeDesc
 			,d.QuantityOrdered
+			,d.UnitCost * d.QuantityOrdered as Cost
 			,d.CommentText
 			,h.UDF_AVAILABLE_COMMENT
 			,h.WarehouseCode
@@ -48,6 +49,7 @@ SELECT     DISTINCT
 		   ,ItemCode
 		   ,d.ItemCodeDesc
 		   ,QuantityOrdered as Quantity
+		   , 0.00 as Cost
 		   ,UnitPrice as Price
 		   ,ExtensionAmt as Total
 		   ,d.CommentText as LineComment
@@ -60,6 +62,7 @@ SELECT     DISTINCT
 		   ,ItemCode
 		   ,d.ItemCodeDesc
 		   ,QuantityOrdered as Quantity
+		   , 0.00 as Cost
 		   ,UnitPrice as Price
 		   ,ExtensionAmt as Total
 		   ,CommentText as LineComment
@@ -73,6 +76,7 @@ SELECT     DISTINCT
 		   ,ItemCode
 		   ,d.ItemCodeDesc
 		   ,QuantityShipped as Quantity
+		   , 0.00 as Cost
 		   ,UnitPrice as Price
 		   ,ExtensionAmt as Total
 		   ,CommentText as LineComment
@@ -87,6 +91,7 @@ SELECT	   DISTINCT
 		   ,ItemCode
 		   ,ItemCodeDesc
 		   ,QuantityOrdered as Quantity
+		   ,Cost
 		   ,0.0 as Price
 		   ,0.0 as Total
 		   ,CommentText as LineComment
@@ -99,6 +104,7 @@ SELECT DISTINCT
 	,o.ItemCode as Item
 	, CASE WHEN i.UDF_BRAND_NAMES = '' THEN o.ItemCodeDesc ELSE '' END AS 'Desc'
 	, CONVERT(DECIMAL(9,4),(ROUND(Quantity,4))) AS Qty
+	, CONVERT(DECIMAL(9,2),(ROUND(Cost,2))) AS Cost
 	, CONVERT(DECIMAL(9,2),(ROUND(Price,2))) AS Pri
 	, CONVERT(DECIMAL(9,2),(ROUND(Total,2))) AS Tot
 	, LineComment as ItmCmt
