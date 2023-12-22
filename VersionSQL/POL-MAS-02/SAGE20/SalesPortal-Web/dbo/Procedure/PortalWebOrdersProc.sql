@@ -1,6 +1,6 @@
 ﻿/****** Object:  Procedure [dbo].[PortalWebOrdersProc]    Committed by VersionSQL https://www.versionsql.com ******/
 
-CREATE PROCEDURE [dbo].[PortalWebOrdersProc]
+CREATE PROCEDURE dbo.PortalWebOrdersProc
 	-- Add the parameters for the stored procedure here
 	@UserName varchar(25)
 AS
@@ -28,6 +28,7 @@ SELECT Main = (SELECT
 	  ,Item
 	  ,[Desc]
       ,[Qty]
+	  ,[Cost]
       ,[Pri]
       ,[Tot]
 	  ,ItmCmt
