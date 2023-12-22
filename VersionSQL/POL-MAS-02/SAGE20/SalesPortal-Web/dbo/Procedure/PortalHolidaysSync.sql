@@ -1,6 +1,6 @@
 ﻿/****** Object:  Procedure [dbo].[PortalHolidaysSync]    Committed by VersionSQL https://www.versionsql.com ******/
 
-CREATE PROCEDURE [dbo].[PortalHolidaysSync]
+CREATE PROCEDURE dbo.PortalHolidaysSync
 	@UserName varchar(25),
 	@TimeSync varchar(50)
 AS
@@ -75,10 +75,10 @@ FROM #temp_PortalHolidays_Current
 WHERE RepCode = @RepCode
 END
 
-SELECT ISNULL(JSON_QUERY((SELECT TOP(1) CONVERT(varchar, TimeSync, 121) as TimeSync
+SELECT ISNULL(JSON_QUERY((SELECT TOP(1) CONVERT(varchar, TimeSync, 121) as Time
    , Op = CASE WHEN NOT EXISTS(SELECT [Date] FROM #temp_PortalHolidays) THEN 'E' WHEN Operation = 'C' THEN 'C' ELSE 'U' END
-   , D = ISNULL((SELECT [Date] AS Date FROM #temp_PortalHolidays WHERE Operation = 'D' FOR JSON PATH),'[]')
-   , A = ISNULL((SELECT [Date] AS Date FROM #temp_PortalHolidays WHERE Operation !='D' FOR JSON PATH),'[]')
+   , D = ISNULL((SELECT CONVERT(varchar, [Date], 12) AS Date FROM #temp_PortalHolidays WHERE Operation = 'D' FOR JSON PATH),'[]')
+   , A = ISNULL((SELECT CONVERT(varchar, [Date], 12) AS Date FROM #temp_PortalHolidays WHERE Operation !='D' FOR JSON PATH),'[]')
 	FROM #temp_PortalHolidays
 	FOR JSON PATH, WITHOUT_ARRAY_WRAPPER)), '{"Op": "E"}')
 
