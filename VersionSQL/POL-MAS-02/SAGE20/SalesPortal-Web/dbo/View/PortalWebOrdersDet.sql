@@ -68,7 +68,7 @@ SELECT     DISTINCT
 		   ,CommentText as LineComment
 FROM         MAS_POL.dbo.SO_SalesOrderHeader h INNER JOIN
                        MAS_POL.dbo.SO_SalesOrderDetail d ON h.SalesOrderNo = d.SalesOrderNo
-WHERE    CurrentInvoiceNo = '' AND (ROUND(QuantityOrdered,2) > 0 or ROUND(ExtensionAmt,2) > 0)
+WHERE    d.WarehouseCode != '002' and CurrentInvoiceNo = '' AND (ROUND(QuantityOrdered,2) > 0 or ROUND(ExtensionAmt,2) > 0)
 UNION ALL
 SELECT     DISTINCT 
 		   h.InvoiceNo as OrderNo
