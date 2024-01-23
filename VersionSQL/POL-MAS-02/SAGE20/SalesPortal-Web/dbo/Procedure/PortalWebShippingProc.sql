@@ -1,6 +1,6 @@
 ﻿/****** Object:  Procedure [dbo].[PortalWebShippingProc]    Committed by VersionSQL https://www.versionsql.com ******/
 
-CREATE PROCEDURE [dbo].[PortalWebShippingProc]
+CREATE PROCEDURE dbo.PortalWebShippingProc
 	@UserName varchar(25)
 AS
 BEGIN
@@ -24,6 +24,7 @@ SELECT      IsNull(c.CountryName,'') as Ctry
 				 , CASE WHEN h.UDF_ETD IS NULL THEN '' ELSE CONVERT(varchar,h.UDF_ETD,23) END AS ETD
 				 , CASE WHEN h.UDF_ETA IS NULL THEN '' ELSE CONVERT(varchar,h.UDF_ETA,23) END AS ETA
 				 , v.VendorName AS Vendor
+				 , v.UDF_SAMPLE_ALLOW AS SampleAllow
 				 , t.TermsCodeDesc AS Terms
 				 , d.ItemCode AS ItemCode
 				 , i.UDF_BRAND_NAMES + ' ' + i.UDF_DESCRIPTION + ' ' + i.UDF_VINTAGE + ' (' + REPLACE(i.SalesUnitOfMeasure, 'C', '') 
