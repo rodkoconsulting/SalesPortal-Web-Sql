@@ -1,6 +1,6 @@
 ﻿/****** Object:  Procedure [dbo].[PortalOrderDetail_sync]    Committed by VersionSQL https://www.versionsql.com ******/
 
-CREATE PROCEDURE [dbo].[PortalOrderDetail_sync]
+CREATE PROCEDURE dbo.PortalOrderDetail_sync
 	@UserName varchar(25),
 	@TimeSync datetime
 AS
@@ -38,7 +38,7 @@ SELECT     @CurrentDate as TimeSync,
 		   left(CommentText,2048) as Comment
 FROM         MAS_POL.dbo.SO_SalesOrderDetail INNER JOIN
                       MAS_POL.dbo.SO_SalesOrderHeader ON MAS_POL.dbo.SO_SalesOrderDetail.SalesOrderNo = MAS_POL.dbo.SO_SalesOrderHeader.SalesOrderNo
-WHERE    ((@AccountType = 'REP' and SalespersonNo = @RepCode) or (@AccountType = 'OFF' and SalespersonNo not like 'XX%')) and CAST(ROUND(QuantityOrdered,2) AS FLOAT) > 0 AND MAS_POL.dbo.SO_SalesOrderHeader.CurrentInvoiceNo = ''
+WHERE    SO_SalesOrderDetail.WarehouseCode != '002' and ((@AccountType = 'REP' and SalespersonNo = @RepCode) or (@AccountType = 'OFF' and SalespersonNo not like 'XX%')) and CAST(ROUND(QuantityOrdered,2) AS FLOAT) > 0 AND MAS_POL.dbo.SO_SalesOrderHeader.CurrentInvoiceNo = ''
 UNION ALL
 SELECT     @CurrentDate as TimeSync,
 		   @RepCode as RepCode,
