@@ -25,7 +25,7 @@ BEGIN
 		,i.UDF_BRAND_NAMES + ' ' + i.UDF_DESCRIPTION + ' ' + i.UDF_VINTAGE + ' (' + REPLACE(i.SalesUnitOfMeasure,
                        'C', '') + '/' + (CASE WHEN CHARINDEX('ML', i.UDF_BOTTLE_SIZE) > 0 THEN REPLACE(IsNull(i.UDF_BOTTLE_SIZE, ''), 
                       ' ML', '') ELSE REPLACE(i.UDF_BOTTLE_SIZE, ' ', '') END) + ') ' + i.UDF_DAMAGED_NOTES AS Description
-		,CAST(Quantity AS FLOAT) AS Quantity
+		,d.Bottles
 		,ISNULL(d.Comment,'') AS Comment
 	FROM dbo.PortalWebSampleSavedHeader h INNER JOIN dbo.PortalWebSampleSavedDetails d ON h.OrderNo = d.OrderNo
 		INNER JOIN CI_Item i ON d.ITEMCODE = i.ItemCode

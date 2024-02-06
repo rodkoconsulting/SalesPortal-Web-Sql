@@ -3,7 +3,7 @@
 CREATE TABLE dbo.PortalWebSampleSavedDetails(
 	[ORDERNO] [bigint] NOT NULL,
 	[ITEMCODE] [varchar](15) NOT NULL,
-	[Quantity] [decimal](9, 5) NOT NULL,
+	[Bottles] [int] NOT NULL,
 	[Comment] [varchar](100) NULL,
  CONSTRAINT [PK_PortalWebSampleSavedDetails] PRIMARY KEY CLUSTERED 
 (
