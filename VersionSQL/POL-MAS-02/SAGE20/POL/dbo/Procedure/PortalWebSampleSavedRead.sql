@@ -20,6 +20,7 @@ BEGIN
 		,CONVERT(varchar, Date_Delivery, 12) as DateDelivery
 		,h.Notes as 'Note'
 		,ShipTo
+		,s.ShipToName
 		,d.ItemCode
 		,CASE WHEN TRY_CAST(REPLACE(i.SalesUnitOfMeasure,'C','') AS INT) IS NULL OR TRY_CAST(REPLACE(i.SalesUnitOfMeasure,'C','') AS INT) <=0 THEN 12 ELSE TRY_CAST(REPLACE(i.SalesUnitOfMeasure,'C','') AS INT) END AS 'Uom'
 		,i.UDF_BRAND_NAMES + ' ' + i.UDF_DESCRIPTION + ' ' + i.UDF_VINTAGE + ' (' + REPLACE(i.SalesUnitOfMeasure,
@@ -29,5 +30,6 @@ BEGIN
 		,ISNULL(d.Comment,'') AS Comment
 	FROM dbo.PortalWebSampleSavedHeader h INNER JOIN dbo.PortalWebSampleSavedDetails d ON h.OrderNo = d.OrderNo
 		INNER JOIN CI_Item i ON d.ITEMCODE = i.ItemCode
+		INNER JOIN MAS_POL.dbo.PO_ShipToAddress s ON h.SHIPTO  = s.ShipToCode
 	WHERE h.UserName = @UserName
 END
