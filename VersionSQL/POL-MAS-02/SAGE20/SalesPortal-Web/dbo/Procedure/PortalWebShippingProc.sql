@@ -37,6 +37,7 @@ SELECT      IsNull(c.CountryName,'') as Ctry
 				, v.UDF_TTBFPID as TTB_FPID
 				, v.UDF_TTB_MANUFACTURER as TTB_Manufacturer
 				, CASE WHEN v.UDF_ASSIGNED = 'Y' THEN 'x' ELSE '' END as TTB_Assigned
+				, i.UDF_ALCOHOL_PCT as Abv
 FROM            MAS_POL.dbo.PO_PurchaseOrderHeader AS h INNER JOIN
                          MAS_POL.dbo.SO_ShippingRateHeader AS s ON h.ShipVia = s.ShippingCode INNER JOIN
                          MAS_POL.dbo.AP_Vendor AS v ON h.APDivisionNo = v.APDivisionNo AND h.VendorNo = v.VendorNo INNER JOIN
