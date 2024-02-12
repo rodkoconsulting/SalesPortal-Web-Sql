@@ -2,13 +2,35 @@
 
 CREATE VIEW dbo.VirtualFeed_Zachys_ProductQuery
 AS
-SELECT     i.ITEMCODE AS [Item #]
+SELECT      i.UDF_BRAND_NAMES AS [Producer]
+			, i.UDF_BRAND_NAMES + ' ' + i.UDF_DESCRIPTION + ' ' + i.UDF_VINTAGE + ' (' + REPLACE(i.SalesUnitOfMeasure,
+                       'C', '') + '/' + (CASE WHEN CHARINDEX('ML', i.UDF_BOTTLE_SIZE) > 0 THEN REPLACE(IsNull(i.UDF_BOTTLE_SIZE, ''), 
+                      ' ML', '') ELSE REPLACE(i.UDF_BOTTLE_SIZE, ' ', '') END) + ') ' + i.UDF_DAMAGED_NOTES AS [Product Name]
+			, i.ITEMCODE AS [SKU]
+			, CASE WHEN i.UDF_WINE_COLOR = 'Port' THEN 'Port'
+				WHEN i.UDF_WINE_COLOR = 'Sherry' THEN 'Sherry'
+				WHEN i.UDF_WINE_COLOR = 'Red' and reg.UDF_REGION = 'Bordeaux' THEN 'Red Bordeaux'
+				WHEN i.UDF_WINE_COLOR = 'Red' and reg.UDF_REGION = 'Burgundy' THEN 'Red Burgundy'
+				WHEN reg.UDF_REGION = 'Alsace' THEN 'Alsace'
+				WHEN reg.UDF_REGION = 'Rhone' THEN 'Rhone'
+				WHEN reg.UDF_REGION = 'Beaujolais' THEN 'Beaujolais'
+				WHEN reg.UDF_REGION = 'California' THEN 'California'
+				WHEN reg.UDF_REGION = 'Champagne' THEN 'Champagne'
+				WHEN reg.UDF_REGION = 'Loire' THEN 'Loire'
+				WHEN reg.UDF_REGION = 'Oregon' THEN 'Oregon'
+				WHEN reg.UDF_REGION IN ('Corsica', 'Languedoc', 'Provence', 'Southwest') THEN 'Southern France'
+				WHEN i.UDF_COUNTRY = 'Australia' THEN 'Australia'
+				WHEN i.UDF_COUNTRY = 'Austria' THEN 'Austria'
+				WHEN i.UDF_COUNTRY = 'Germany' THEN 'Germany'
+				WHEN i.UDF_COUNTRY = 'Italy' THEN 'Italy'
+				WHEN i.UDF_COUNTRY = 'New Zealand' THEN 'New Zealand'
+				WHEN i.UDF_COUNTRY IN ('Chile','Argentina') THEN 'South America'
+				ELSE 'Misc Wine' END AS [Department]
 			, i.UDF_UPC_CODE AS UPC
-			, i.UDF_DESCRIPTION + CASE WHEN i.UDF_DAMAGED_NOTES like 'CANS%' THEN ' CANS' ELSE '' END AS [Product Name]
 			, CASE WHEN LEN(dbo.SuperTrimLeft(i.UDF_NOTES_VARIETAL)) > 0 AND LEN(dbo.SuperTrimLeft(i.UDF_NOTES_TASTING)) > 0 THEN i.UDF_NOTES_VARIETAL + '; ' + i.UDF_NOTES_TASTING 
                    WHEN LEN(dbo.SuperTrimLeft(i.UDF_NOTES_VARIETAL)) > 0 THEN i.UDF_NOTES_VARIETAL 
                    ELSE i.UDF_NOTES_TASTING END AS [Product Description]
-			, i.UDF_BRAND_NAMES AS [Producer]
+			
 			, CASE WHEN i.UDF_WINE_COLOR = 'Sake' THEN 'Sake'
               WHEN i.UDF_WINE_COLOR IN ('Port', 'Sweet / Fortified', 'Sherry', 'Madeira') THEN 'Sweet'
 			  WHEN (i.UDF_WINE_COLOR = 'Sparkling' OR i.UDF_VARIETALS_T IN ('PEAR', 'APPLE')) AND (UPPER(i.UDF_DESCRIPTION) LIKE '%ROSE%' OR UPPER(i.UDF_DESCRIPTION) LIKE '%ROSA[TD]O%' OR UPPER(i.UDF_DESCRIPTION) LIKE '%VIN GRIS%') THEN 'Sparkling Rose'
