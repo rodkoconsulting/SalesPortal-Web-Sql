@@ -11,12 +11,12 @@ SELECT      i.UDF_BRAND_NAMES AS [Producer]
 				WHEN i.UDF_WINE_COLOR IN ('Port', 'Sherry') THEN i.UDF_WINE_COLOR
 				WHEN i.UDF_WINE_COLOR IN ('Red', 'White') AND reg.UDF_REGION IN ('Bordeaux', 'Burgundy') THEN i.UDF_WINE_COLOR + ' ' + reg.UDF_REGION
 				WHEN reg.UDF_REGION IN ('Alsace', 'Rhone', 'Beaujolais', 'California', 'Champagne', 'Loire', 'Oregon') THEN reg.UDF_REGION
-				WHEN reg.UDF_REGION IN ('Corsica', 'Languedoc', 'Provence', 'Southwest') THEN 'Southern France'
+				WHEN reg.UDF_REGION IN ('Languedoc', 'Provence', 'Southwest') THEN 'Southern France'
 				WHEN i.UDF_COUNTRY IN ('Australia', 'Austria', 'Germany', 'Italy', 'New Zealand', 'Spain') THEN i.UDF_COUNTRY
 				WHEN i.UDF_COUNTRY = 'USA' THEN 'USA Wines'
 				WHEN i.UDF_COUNTRY IN ('Chile','Argentina') THEN 'South America'
 				ELSE 'Misc Wine' END AS [Department]
-			, Replace(i.UDF_UPC_CODE,'n/a','') AS [UPC Code]
+			, Replace(Replace(i.UDF_UPC_CODE,'n/a',''), char(9),'') AS [UPC Code]
 			, Replace(i.UDF_BOTTLE_SIZE, ' ','') as [Size]
 			, Replace(i.STANDARDUNITOFMEASURE, 'C', '') AS [Pack Size]
 			, LEFT(i.UDF_BOTTLE_SIZE, CHARINDEX(' ', i.UDF_BOTTLE_SIZE, 1)) as [Qty in Bottles]
@@ -33,7 +33,7 @@ SELECT      i.UDF_BRAND_NAMES AS [Producer]
 			  END AS [Class]
 			, IsNull(var.UDF_VARIETAL,'') AS [Varietal]
 			, i.UDF_COUNTRY AS [Country]
-			, IsNull(reg.UDF_REGION,'') AS [Region]
+			, Replace(Replace(IsNull(reg.UDF_REGION,''),char(13),''),char(10),'') AS [Region]
 			, IsNull(app.UDF_NAME,'') AS [Appellation]
             , i.UDF_VINTAGE AS [Vintage]
 FROM         MAS_POL.dbo.CI_Item i INNER JOIN
