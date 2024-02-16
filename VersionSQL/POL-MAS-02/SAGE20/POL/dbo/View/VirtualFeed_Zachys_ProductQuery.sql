@@ -21,7 +21,8 @@ SELECT      i.UDF_BRAND_NAMES AS [Producer]
 			, FORMAT(p.DiscountMarkup1 / IsNull(dbo.TryConvertUom(Replace(i.STANDARDUNITOFMEASURE, 'C', '')), 12), 'c', 'en-US') as [Frontline Price]
 			, FORMAT(CASE WHEN Replace(p.ValidDateDescription_234, ' ','') NOT LIKE '%12B%' THEN p.DiscountMarkup1 / IsNull(dbo.TryConvertUom(Replace(i.STANDARDUNITOFMEASURE, 'C', '')), 12)
 				ELSE SUBSTRING(Replace(p.ValidDateDescription_234, ' ',''), CHARINDEX('12B', Replace(p.ValidDateDescription_234, ' ','')) - 3,2) END, 'c', 'en-US') AS [One Case Price]
-			, FORMAT(CASE WHEN p.BreakQuantity1 != 1 AND Replace(p.ValidDateDescription_234, ' ','') NOT LIKE '%12B%' THEN p.DiscountMarkup1 / IsNull(dbo.TryConvertUom(Replace(i.STANDARDUNITOFMEASURE, 'C', '')), 12) 
+			, FORMAT(CASE WHEN p.BreakQuantity1 != 1 AND Replace(p.ValidDateDescription_234, ' ','') NOT LIKE '%12B%' THEN p.DiscountMarkup1 / IsNull(dbo.TryConvertUom(Replace(i.STANDARDUNITOFMEASURE, 'C', '')), 12)
+				WHEN Replace(p.ValidDateDescription_234, ' ','') LIKE '%24B%' THEN SUBSTRING(Replace(p.ValidDateDescription_234, ' ',''), CHARINDEX('24B', Replace(p.ValidDateDescription_234, ' ','')) - 3,2)
 				WHEN Replace(p.ValidDateDescription_234, ' ','') LIKE '%12B%' THEN SUBSTRING(Replace(p.ValidDateDescription_234, ' ',''), CHARINDEX('12B', Replace(p.ValidDateDescription_234, ' ','')) - 3,2)
 				ELSE p.DiscountMarkup2 / IsNull(dbo.TryConvertUom(Replace(i.STANDARDUNITOFMEASURE, 'C', '')), 12) END, 'c', 'en-US') as [Two Case Price]
 			, FORMAT(p.DiscountMarkup1 * 1.5 / IsNull(dbo.TryConvertUom(Replace(i.STANDARDUNITOFMEASURE, 'C', '')), 12), 'c', 'en-US') as [MSRP]
