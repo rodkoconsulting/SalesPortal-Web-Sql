@@ -3,9 +3,7 @@
 CREATE VIEW dbo.VirtualFeed_Zachys_ProductQuery
 AS
 SELECT      i.UDF_BRAND_NAMES AS [Producer]
-			, i.UDF_BRAND_NAMES + ' ' + i.UDF_DESCRIPTION + ' ' + i.UDF_VINTAGE + ' (' + REPLACE(i.SalesUnitOfMeasure,
-                       'C', '') + '/' + (CASE WHEN CHARINDEX('ML', i.UDF_BOTTLE_SIZE) > 0 THEN REPLACE(IsNull(i.UDF_BOTTLE_SIZE, ''), 
-                      ' ML', '') ELSE REPLACE(i.UDF_BOTTLE_SIZE, ' ', '') END) + ') ' + i.UDF_DAMAGED_NOTES AS [Product Name]
+			, i.UDF_BRAND_NAMES + ' ' + i.UDF_DESCRIPTION + ' ' + i.UDF_VINTAGE + ' (' + Replace(i.UDF_BOTTLE_SIZE, ' ','') + ') ' + i.UDF_DAMAGED_NOTES AS [Product Name]
 			, i.ITEMCODE AS [SKU]
 			, CASE WHEN UDF_DESCRIPTION like 'Vermouth' THEN 'Vermouth/Apertif'
 				WHEN i.UDF_WINE_COLOR IN ('Port', 'Sherry') THEN i.UDF_WINE_COLOR
@@ -19,11 +17,13 @@ SELECT      i.UDF_BRAND_NAMES AS [Producer]
 			, Replace(Replace(i.UDF_UPC_CODE,'n/a',''), char(9),'') AS [UPC Code]
 			, Replace(i.UDF_BOTTLE_SIZE, ' ','') as [Size]
 			, Replace(i.STANDARDUNITOFMEASURE, 'C', '') AS [Pack Size]
-			, LEFT(i.UDF_BOTTLE_SIZE, CHARINDEX(' ', i.UDF_BOTTLE_SIZE, 1)) as [Qty in Bottles]
+			, CAST(ROUND(av.QuantityAvailable * IsNull(dbo.TryConvertUom(Replace(i.STANDARDUNITOFMEASURE, 'C', '')), 12),0) as INT) as [Qty in Bottles]
 			, FORMAT(p.DiscountMarkup1 / IsNull(dbo.TryConvertUom(Replace(i.STANDARDUNITOFMEASURE, 'C', '')), 12), 'c', 'en-US') as [Frontline Price]
 			, FORMAT(CASE WHEN Replace(p.ValidDateDescription_234, ' ','') NOT LIKE '%12B%' THEN p.DiscountMarkup1 / IsNull(dbo.TryConvertUom(Replace(i.STANDARDUNITOFMEASURE, 'C', '')), 12)
 				ELSE SUBSTRING(Replace(p.ValidDateDescription_234, ' ',''), CHARINDEX('12B', Replace(p.ValidDateDescription_234, ' ','')) - 3,2) END, 'c', 'en-US') AS [One Case Price]
-			, FORMAT(CASE WHEN p.BreakQuantity1 != 1 THEN p.DiscountMarkup1 / IsNull(dbo.TryConvertUom(Replace(i.STANDARDUNITOFMEASURE, 'C', '')), 12) ELSE p.DiscountMarkup2 / IsNull(dbo.TryConvertUom(Replace(i.STANDARDUNITOFMEASURE, 'C', '')), 12) END, 'c', 'en-US') as [Two Case Price]
+			, FORMAT(CASE WHEN p.BreakQuantity1 != 1 AND Replace(p.ValidDateDescription_234, ' ','') NOT LIKE '%12B%' THEN p.DiscountMarkup1 / IsNull(dbo.TryConvertUom(Replace(i.STANDARDUNITOFMEASURE, 'C', '')), 12) 
+				WHEN Replace(p.ValidDateDescription_234, ' ','') LIKE '%12B%' THEN SUBSTRING(Replace(p.ValidDateDescription_234, ' ',''), CHARINDEX('12B', Replace(p.ValidDateDescription_234, ' ','')) - 3,2)
+				ELSE p.DiscountMarkup2 / IsNull(dbo.TryConvertUom(Replace(i.STANDARDUNITOFMEASURE, 'C', '')), 12) END, 'c', 'en-US') as [Two Case Price]
 			, FORMAT(p.DiscountMarkup1 * 1.5 / IsNull(dbo.TryConvertUom(Replace(i.STANDARDUNITOFMEASURE, 'C', '')), 12), 'c', 'en-US') as [MSRP]
 			, CASE WHEN i.UDF_WINE_COLOR IN ('Port', 'Sweet / Fortified', 'Sherry', 'Madeira') THEN 'Sweet'
 			  WHEN (i.UDF_WINE_COLOR = 'Sparkling' OR i.UDF_VARIETALS_T IN ('PEAR', 'APPLE')) AND (UPPER(i.UDF_DESCRIPTION) LIKE '%ROSE%' OR UPPER(i.UDF_DESCRIPTION) LIKE '%ROSA[TD]O%' OR UPPER(i.UDF_DESCRIPTION) LIKE '%VIN GRIS%') THEN 'Sparkling Rose'
@@ -40,6 +40,7 @@ FROM         MAS_POL.dbo.CI_Item i INNER JOIN
 					  dbo.VirtualFeed_Zachys_Items z ON i.ItemCode = z.ItemCode INNER JOIN
                       dbo.IM_ItemWarehouse_000 w ON i.ItemCode = w.ItemCode INNER JOIN
                       MAS_POL.dbo.AP_Vendor ven ON i.PrimaryAPDivisionNo = ven.APDivisionNo AND i.PrimaryVendorNo = ven.VendorNo INNER JOIN
+					  dbo.IM_InventoryAvailable av ON i.ItemCode = av.ItemCode INNER JOIN
                       dbo.IM_PriceCode_TODAY p ON i.ItemCode = p.ItemCode LEFT OUTER JOIN
 					  MAS_POL.dbo.CI_UDT_VARIETALS var ON i.UDF_VARIETALS_T = var.UDF_VARIETAL_CODE LEFT OUTER JOIN
 					  MAS_POL.dbo.CI_UDT_PRIMARY_REGION reg ON i.UDF_REGION = reg.UDF_PRIMARY_REGION_CODE LEFT OUTER JOIN
