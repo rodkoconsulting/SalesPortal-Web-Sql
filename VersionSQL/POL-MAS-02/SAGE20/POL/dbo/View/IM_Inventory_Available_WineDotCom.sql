@@ -3,7 +3,7 @@
 CREATE VIEW dbo.IM_Inventory_Available_WineDotCom
 AS
 SELECT        ITEMCODE AS 'ItemCode'
-				, CASE WHEN CAST(CAST(REPLACE(STANDARDUNITOFMEASURE, 'C', '') AS int) * QuantityAvailable AS int) > = 12 THEN 12 ELSE 0 END AS 'Available'
+				, CASE WHEN CAST(CAST(REPLACE(STANDARDUNITOFMEASURE, 'C', '') AS int) * QuantityAvailable AS int) > = 36 THEN 36 ELSE CAST(CAST(REPLACE(STANDARDUNITOFMEASURE, 'C', '') AS int) * QuantityAvailable AS int) END AS 'Available'
 FROM            dbo.IM_InventoryAvailable
 WHERE        (CAST(REPLACE(STANDARDUNITOFMEASURE, 'C', '') AS int) * QuantityAvailable >= 1)
 
