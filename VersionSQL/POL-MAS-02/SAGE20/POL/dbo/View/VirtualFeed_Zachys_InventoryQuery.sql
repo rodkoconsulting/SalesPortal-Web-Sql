@@ -2,7 +2,7 @@
 
 CREATE VIEW dbo.VirtualFeed_Zachys_InventoryQuery
 AS
-SELECT      i.ITEMCODE AS [SKU]
+SELECT      i.ITEMCODE AS [Sku]
 			, CAST(ROUND(av.QuantityAvailable * IsNull(dbo.TryConvertUom(Replace(i.STANDARDUNITOFMEASURE, 'C', '')), 12),0) as INT) as [Available to Sell]
 FROM         MAS_POL.dbo.CI_Item i INNER JOIN
 					  dbo.VirtualFeed_Zachys_Items z ON i.ItemCode = z.ItemCode INNER JOIN

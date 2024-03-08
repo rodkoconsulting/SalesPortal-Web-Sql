@@ -5,18 +5,18 @@ AS
 SELECT      i.UDF_BRAND_NAMES AS [Producer]
 			, i.UDF_BRAND_NAMES + ' ' + i.UDF_DESCRIPTION + ' ' + i.UDF_VINTAGE + ' (' + Replace(i.UDF_BOTTLE_SIZE, ' ','') + ') ' + i.UDF_DAMAGED_NOTES AS [Product Name]
 			, i.ITEMCODE AS [SKU]
-			, CASE WHEN UDF_DESCRIPTION like 'Vermouth' THEN 'Vermouth/Apertif'
+			, CASE WHEN UDF_DESCRIPTION like '%Vermouth%' THEN 'VERMOUTH/APERITIF'
 				WHEN i.UDF_WINE_COLOR IN ('Port') THEN Upper(i.UDF_WINE_COLOR)
-				WHEN i.UDF_WINE_COLOR IN ('Sherry') THEN 'Shery'
-				WHEN i.UDF_WINE_COLOR IN ('Red', 'White') AND reg.UDF_REGION IN ('Bordeaux', 'Burgundy') THEN i.UDF_WINE_COLOR + ' ' + reg.UDF_REGION
-				WHEN reg.UDF_REGION IN ('Alsace', 'Beaujolais', 'Loire') THEN Upper(reg.UDF_REGION)
-				WHEN reg.UDF_REGION IN ('Alsace', 'Rhone', 'Beaujolais', 'California', 'Champagne', 'Loire', 'Oregon') THEN reg.UDF_REGION
+				WHEN i.UDF_WINE_COLOR IN ('Sherry, Madeira') THEN 'SHERRY MADEIRA'
+				WHEN i.UDF_WINE_COLOR IN ('Red', 'White') AND reg.UDF_REGION IN ('Bordeaux', 'Burgundy') THEN Upper(i.UDF_WINE_COLOR + ' ' + reg.UDF_REGION)
+				WHEN reg.UDF_REGION IN ('Rhone','Alsace', 'Beaujolais', 'California', 'Champagne') THEN Upper(reg.UDF_REGION)
+				WHEN reg.UDF_REGION IN ('Oregon', 'Loire') THEN reg.UDF_REGION
 				WHEN reg.UDF_REGION IN ('Languedoc', 'Provence', 'Southwest') THEN 'Southern France'
-				WHEN i.UDF_COUNTRY IN ('Germany') THEN Upper(i.UDF_COUNTRY)
-				WHEN i.UDF_COUNTRY IN ('Australia', 'Austria', 'Italy', 'New Zealand', 'Spain') THEN i.UDF_COUNTRY
+				WHEN i.UDF_COUNTRY IN ('Australia', 'Italy', 'Spain') THEN Upper(i.UDF_COUNTRY)
+				WHEN i.UDF_COUNTRY IN ('Germany','Austria', 'New Zealand') THEN i.UDF_COUNTRY
 				WHEN i.UDF_COUNTRY = 'USA' THEN 'USA WINES'
-				WHEN i.UDF_COUNTRY IN ('Chile','Argentina') THEN 'South America'
-				ELSE 'MISC Wine' END AS [Department]
+				WHEN i.UDF_COUNTRY IN ('Chile','Argentina') THEN 'SOUTH AMERICA'
+				ELSE 'MISC WINE' END AS [Department]
 			, Replace(Replace(i.UDF_UPC_CODE,'n/a',''), char(9),'') AS [UPC Code]
 			, Replace(i.UDF_BOTTLE_SIZE, ' ','') as [Size]
 			, Replace(i.STANDARDUNITOFMEASURE, 'C', '') AS [Pack Size]
@@ -40,6 +40,14 @@ SELECT      i.UDF_BRAND_NAMES AS [Producer]
 			, Replace(Replace(IsNull(reg.UDF_REGION,''),char(13),''),char(10),'') AS [Region]
 			, CASE WHEN IsNull(app.UDF_NAME,'') != '' THEN IsNull(app.UDF_NAME,'') ELSE Replace(Replace(IsNull(reg.UDF_REGION,''),char(13),''),char(10),'') END AS [Appellation]
             , i.UDF_VINTAGE AS [Vintage]
+			, Replace(Replace(IsNull(i.UDF_NOTES_TASTING,''),char(13),''),char(10),'') as [Description]
+			, '' as [Critic Name 1]
+			, '' as [Critic Score 1]
+			, '' as [Critic Notes 1]
+			, '' as [Critic Name 2]
+			, '' as [Critic Score 2]
+			, '' as [Critic Notes 2]
+			, CASE WHEN len(i.ImageFile) > 0 THEN 'https://polaner-labels.s3.amazonaws.com/' + i.ImageFile ELSE '' END as [Bottle Image URL]
 FROM         MAS_POL.dbo.CI_Item i INNER JOIN
 					  dbo.VirtualFeed_Zachys_Items z ON i.ItemCode = z.ItemCode INNER JOIN
                       dbo.IM_ItemWarehouse_000 w ON i.ItemCode = w.ItemCode INNER JOIN
