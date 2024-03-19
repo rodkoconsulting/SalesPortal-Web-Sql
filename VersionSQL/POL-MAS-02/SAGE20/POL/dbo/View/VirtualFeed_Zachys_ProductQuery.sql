@@ -28,7 +28,7 @@ SELECT      CASE WHEN i.UDF_BRAND_NAMES ='Arnot-Roberts' THEN 'Arnot Roberts'
 				ELSE i.UDF_BRAND_NAMES END AS [Producer]
 			, Replace(Replace(i.UDF_BRAND_NAMES,' (Grand''Cour)',''),'Dutraive, Famille', 'Famille Dutraive')
 				+ ' ' +
-				Replace(Replace(Replace(Replace(Replace(i.UDF_DESCRIPTION, ' 1er Cru',''),' GC',''),' VdF',''),'Mtn','Mountain'),'VV','Vieilles Vignes')
+				Replace(Replace(Replace(Replace(Replace(Replace(Replace(Replace(Replace(Replace(Replace(i.UDF_DESCRIPTION, ' 1er Cru',''),' GC',''),' VdF',''),'Mtn','Mountain'),'VV','Vieilles Vignes'),'Vyd','Vineyard'),'Vly','Valley'),' [lieu-dit]',''),'RRV','Russian River Valley'),' [sec]',''),'[Vouvray] ','')
 				+ ' ' + i.UDF_VINTAGE + ' (' + Replace(i.UDF_BOTTLE_SIZE, ' ','') + ') ' AS [Product Name]
 			, i.ITEMCODE AS [SKU]
 			, CASE WHEN UDF_DESCRIPTION like '%Vermouth%' THEN 'VERMOUTH/APERITIF'
@@ -47,7 +47,7 @@ SELECT      CASE WHEN i.UDF_BRAND_NAMES ='Arnot-Roberts' THEN 'Arnot Roberts'
 			, Replace(i.UDF_BOTTLE_SIZE, ' ','') as [Size]
 			, Replace(i.STANDARDUNITOFMEASURE, 'C', '') AS [Pack Size]
 			, CASE WHEN CAST(ROUND(av.QuantityAvailable * IsNull(dbo.TryConvertUom(Replace(i.STANDARDUNITOFMEASURE, 'C', '')), 12),0) as INT) > 0 THEN CAST(ROUND(av.QuantityAvailable * IsNull(dbo.TryConvertUom(Replace(i.STANDARDUNITOFMEASURE, 'C', '')), 12),0) as INT) ELSE 1 END as [Qty in Bottles]
-			, FORMAT(p.DiscountMarkup1 / IsNull(dbo.TryConvertUom(Replace(i.STANDARDUNITOFMEASURE, 'N', '')), 12), 'N', 'en-US') as [Frontline Price]
+			, FORMAT(p.DiscountMarkup1 / IsNull(dbo.TryConvertUom(Replace(i.STANDARDUNITOFMEASURE, 'C', '')), 12), 'N', 'en-US') as [Frontline Price]
 			, FORMAT(CASE WHEN Replace(p.ValidDateDescription_234, ' ','') NOT LIKE '%12B%' THEN p.DiscountMarkup1 / IsNull(dbo.TryConvertUom(Replace(i.STANDARDUNITOFMEASURE, 'C', '')), 12)
 				ELSE SUBSTRING(Replace(p.ValidDateDescription_234, ' ',''), CHARINDEX('12B', Replace(p.ValidDateDescription_234, ' ','')) - 3,2) END, 'N', 'en-US') AS [One Case Price]
 			, FORMAT(CASE WHEN p.BreakQuantity1 != 1 AND Replace(p.ValidDateDescription_234, ' ','') NOT LIKE '%12B%' THEN p.DiscountMarkup1 / IsNull(dbo.TryConvertUom(Replace(i.STANDARDUNITOFMEASURE, 'C', '')), 12)
