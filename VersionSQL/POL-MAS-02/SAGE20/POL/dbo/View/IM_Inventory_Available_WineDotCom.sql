@@ -2,10 +2,11 @@
 
 CREATE VIEW dbo.IM_Inventory_Available_WineDotCom
 AS
-SELECT        ITEMCODE AS 'ItemCode'
-				, CASE WHEN CAST(CAST(REPLACE(STANDARDUNITOFMEASURE, 'C', '') AS int) * QuantityAvailable AS int) > = 36 THEN 36 ELSE CAST(CAST(REPLACE(STANDARDUNITOFMEASURE, 'C', '') AS int) * QuantityAvailable AS int) END AS 'Available'
-FROM            dbo.IM_InventoryAvailable
-WHERE        (CAST(REPLACE(STANDARDUNITOFMEASURE, 'C', '') AS int) * QuantityAvailable >= 1)
+SELECT        ia.ITEMCODE AS 'ItemCode'
+				, CASE WHEN i.UDF_RESTRICT_MANAGER != '' OR i.UDF_RESTRICT_ALLOCATED ='Y' OR i.UDF_RESTRICT_OFFSALE ='Y' THEN 0
+				WHEN CAST(CAST(REPLACE(ia.STANDARDUNITOFMEASURE, 'C', '') AS int) * QuantityAvailable AS int) > = 36 THEN 36 ELSE CAST(CAST(REPLACE(ia.STANDARDUNITOFMEASURE, 'C', '') AS int) * QuantityAvailable AS int) END AS 'Available'
+FROM            dbo.IM_InventoryAvailable ia INNER JOIN dbo.CI_Item i on ia.ITEMCODE = i.ItemCode
+WHERE        (CAST(REPLACE(ia.STANDARDUNITOFMEASURE, 'C', '') AS int) * QuantityAvailable >= 1)
 
 EXECUTE sys.sp_addextendedproperty @name = N'MS_DiagramPane1', @value = N'[0E232FF0-B466-11cf-A24F-00AA00A3EFFF, 1.00]
 Begin DesignProperties = 
