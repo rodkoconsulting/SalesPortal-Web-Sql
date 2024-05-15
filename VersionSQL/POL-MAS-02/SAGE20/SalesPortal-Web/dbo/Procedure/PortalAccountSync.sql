@@ -109,36 +109,36 @@ SELECT
 
 IF(@TimeSyncAccountsPrev = @TimeSyncAccounts)
 BEGIN
-	INSERT INTO #temp_PortalAccountList
+INSERT INTO #temp_PortalAccountList
 	SELECT
-	TimeSync,
-	MIN(Operation) as Operation,
-	[ARDivisionNo],
-	[CustomerNo],
-	CASE WHEN MIN(Operation)<>'D' THEN [CustomerName] ELSE '' END AS CustomerName,
-	CASE WHEN MIN(Operation)<>'D' THEN [PriceLevel] ELSE '' END AS PriceLevel,
-	CASE WHEN MIN(Operation)<>'D' THEN [ShipDays] ELSE '' END AS ShipDays,
-	CASE WHEN MIN(Operation)<>'D' THEN [CoopList] ELSE '' END AS CoopList,
-	CASE WHEN MIN(Operation)<>'D' THEN [Buyer1] ELSE '' END AS Buyer1,
-	CASE WHEN MIN(Operation)<>'D' THEN [Buyer2] ELSE '' END AS Buyer2,
-	CASE WHEN MIN(Operation)<>'D' THEN [Buyer3] ELSE '' END AS Buyer3,
-	CASE WHEN MIN(Operation)<>'D' THEN [Buyer1Phone] ELSE '' END AS Buyer1Phone,
-	CASE WHEN MIN(Operation)<>'D' THEN [Buyer2Phone] ELSE '' END AS Buyer2Phone,
-	CASE WHEN MIN(Operation)<>'D' THEN [Buyer3Phone] ELSE '' END AS Buyer3Phone,
-	CASE WHEN MIN(Operation)<>'D' THEN [Buyer1Email] ELSE '' END AS Buyer1Email,
-	CASE WHEN MIN(Operation)<>'D' THEN [Buyer2Email] ELSE '' END AS Buyer2Email, 
-	CASE WHEN MIN(Operation)<>'D' THEN [Buyer3Email] ELSE '' END AS Buyer3Email,
-	CASE WHEN MIN(Operation)<>'D' THEN [Affil] ELSE '' END AS Affil,    
-	CASE WHEN MIN(Operation)<>'D' THEN [Addr1] ELSE '' END AS Addr1,
-	CASE WHEN MIN(Operation)<>'D' THEN [Addr2] ELSE '' END AS Addr2,
-	CASE WHEN MIN(Operation)<>'D' THEN [City] ELSE '' END AS City,
-	CASE WHEN MIN(Operation)<>'D' THEN [State] ELSE '' END AS State,
-	CASE WHEN MIN(Operation)<>'D' THEN [Zip] ELSE '' END AS Zip,
-	CASE WHEN MIN(Operation)<>'D' THEN [Status] ELSE '' END AS Status,
-	CASE WHEN MIN(Operation)<>'D' THEN [Rep] ELSE '' END AS Rep,
-	CASE WHEN MIN(Operation)<>'D' THEN [Region] ELSE '' END AS Region,
-	CASE WHEN MIN(Operation)<>'D' THEN [PrimaryShipTo] ELSE '' END AS PrimaryShipTo,
-	CASE WHEN MIN(Operation)<>'D' THEN [ShipVia] ELSE '' END AS ShipVia
+		@CurrentDate,
+		MIN(Operation) as Operation,
+		[ARDivisionNo],
+		[CustomerNo],
+		CASE WHEN MIN(Operation)<>'D' THEN [CustomerName] ELSE '' END AS CustomerName,
+		CASE WHEN MIN(Operation)<>'D' THEN [PriceLevel] ELSE '' END AS PriceLevel,
+		CASE WHEN MIN(Operation)<>'D' THEN [ShipDays] ELSE '' END AS ShipDays,
+		CASE WHEN MIN(Operation)<>'D' THEN [CoopList] ELSE '' END AS CoopList,
+		CASE WHEN MIN(Operation)<>'D' THEN [Buyer1] ELSE '' END AS Buyer1,
+		CASE WHEN MIN(Operation)<>'D' THEN [Buyer2] ELSE '' END AS Buyer2,
+		CASE WHEN MIN(Operation)<>'D' THEN [Buyer3] ELSE '' END AS Buyer3,
+		CASE WHEN MIN(Operation)<>'D' THEN [Buyer1Phone] ELSE '' END AS Buyer1Phone,
+		CASE WHEN MIN(Operation)<>'D' THEN [Buyer2Phone] ELSE '' END AS Buyer2Phone,
+		CASE WHEN MIN(Operation)<>'D' THEN [Buyer3Phone] ELSE '' END AS Buyer3Phone,
+		CASE WHEN MIN(Operation)<>'D' THEN [Buyer1Email] ELSE '' END AS Buyer1Email,
+		CASE WHEN MIN(Operation)<>'D' THEN [Buyer2Email] ELSE '' END AS Buyer2Email, 
+		CASE WHEN MIN(Operation)<>'D' THEN [Buyer3Email] ELSE '' END AS Buyer3Email,
+		CASE WHEN MIN(Operation)<>'D' THEN [Affil] ELSE '' END AS Affil,    
+		CASE WHEN MIN(Operation)<>'D' THEN [Addr1] ELSE '' END AS Addr1,
+		CASE WHEN MIN(Operation)<>'D' THEN [Addr2] ELSE '' END AS Addr2,
+		CASE WHEN MIN(Operation)<>'D' THEN [City] ELSE '' END AS City,
+		CASE WHEN MIN(Operation)<>'D' THEN [State] ELSE '' END AS State,
+		CASE WHEN MIN(Operation)<>'D' THEN [Zip] ELSE '' END AS Zip,
+		CASE WHEN MIN(Operation)<>'D' THEN [Status] ELSE '' END AS Status,
+		CASE WHEN MIN(Operation)<>'D' THEN [Rep] ELSE '' END AS Rep,
+		CASE WHEN MIN(Operation)<>'D' THEN [Region] ELSE '' END AS Region,
+		CASE WHEN MIN(Operation)<>'D' THEN [PrimaryShipTo] ELSE '' END AS PrimaryShipTo,
+		CASE WHEN MIN(Operation)<>'D' THEN [ShipVia] ELSE '' END AS ShipVia
 FROM
 (
   SELECT 'D' as Operation, [ARDivisionNo],[CustomerNo],[CustomerName] COLLATE SQL_Latin1_General_CP1_CI_AS AS CustomerName,[PriceLevel],[ShipDays],[CoopList],[Buyer1],[Buyer2],[Buyer3],[Buyer1Phone],[Buyer2Phone],[Buyer3Phone],[Buyer1Email],[Buyer2Email],[Buyer3Email],[Affil],[Addr1],[Addr2],[City],[State],[Zip],[Status],[Rep],[Region],PrimaryShipTo,ShipVia
@@ -209,7 +209,7 @@ IF(@TimeSyncHeaderPrev = @TimeSyncHeader)
 BEGIN
 	INSERT INTO #temp_PortalInvoiceHistoryHeader
 	SELECT
-	TimeSync,
+	@CurrentDate as TimeSync,
 	MIN(Operation) as Operation,
 	[InvoiceNo],
 	right(HSeqNo,1) as HSeqNo,
@@ -258,5 +258,82 @@ FROM #temp_PortalInvoiceHistoryHeader_Current
 WHERE RepCode = @RepCode
 END
 
+SELECT     @CurrentDate as TimeSync,
+		   @RepCode as RepCode,
+		   left(h.InvoiceNo,7) as InvoiceNo,
+		   right(h.HeaderSeqNo,1) as HSeqNo,
+		   right(d.DetailSeqNo,3) as DSeqNo,
+		   left(d.ItemCode,30) as ItemCode,
+		   CAST(ROUND(d.QuantityShipped,2) AS FLOAT) as Quantity,
+		   CAST(ROUND(d.UnitPrice,2) AS FLOAT) AS UnitPrice,
+		   CAST(ROUND(d.ExtensionAmt,2) AS FLOAT) AS Total
+INTO #temp_PortalInvoiceHistoryDetail_Current
+FROM         MAS_POL.dbo.AR_InvoiceHistoryDetail d INNER JOIN
+                      MAS_POL.dbo.AR_InvoiceHistoryHeader h ON d.InvoiceNo = h.InvoiceNo AND d.HeaderSeqNo = h.HeaderSeqNo INNER JOIN
+                      MAS_POL.dbo.AR_Customer c ON h.ARDivisionNo = c.ARDivisionNo AND h.CustomerNo = c.CustomerNo
+WHERE     (h.InvoiceDate >= DATEADD(YEAR, - 1, GETDATE())) AND (h.ModuleCode = 'S/O') and ((@AccountType = 'REP' and c.SalespersonNo = @RepCode) or (@AccountType = 'OFF' and c.SalespersonNo not like 'XX%'))
+
+SELECT @TimeSyncDetailsPrev = MAX(TimeSync) FROM PortalInvoiceHistoryDetail_Previous where RepCode=@RepCode
+
+SELECT
+	TimeSync,
+	'C' as Operation,
+	[InvoiceNo],[HSeqNo],[DSeqNo],[ItemCode],[Quantity],[UnitPrice],[Total]
+  INTO #temp_PortalInvoiceHistoryDetail
+  FROM #temp_PortalInvoiceHistoryDetail_Current
+  WHERE 1=2
+
+IF(@TimeSyncDetailsPrev = @TimeSyncDetails)
+BEGIN
+	INSERT INTO #temp_PortalInvoiceHistoryDetail
+	SELECT
+	@CurrentDate as TimeSync,
+	MIN(Operation) as Operation,
+	[InvoiceNo],
+	[HSeqNo],
+	[DSeqNo],
+	CASE WHEN MIN(Operation)<>'D' THEN [ItemCode] ELSE '' END AS ItemCode,
+	CASE WHEN MIN(Operation)<>'D' THEN [Quantity] ELSE 0 END AS Quantity,
+	CASE WHEN MIN(Operation)<>'D' THEN [UnitPrice] ELSE 0 END AS UnitPrice,
+	CASE WHEN MIN(Operation)<>'D' THEN [Total] ELSE 0 END AS Total
+FROM
+(
+  SELECT 'D' as Operation, [InvoiceNo],[HSeqNo],[DSeqNo],[ItemCode],[Quantity],[UnitPrice],[Total]
+  FROM dbo.PortalInvoiceHistoryDetail_Previous
+  WHERE [RepCode] = @RepCode
+  UNION ALL
+  SELECT 'I' as Operation, [InvoiceNo],[HSeqNo],[DSeqNo],[ItemCode],[Quantity],[UnitPrice],[Total]
+  FROM #temp_PortalInvoiceHistoryDetail_Current
+  WHERE [RepCode] = @RepCode
+) tmp
+ 
+GROUP BY [InvoiceNo],[HSeqNo],[DSeqNo],[ItemCode],[Quantity],[UnitPrice],[Total]
+   
+HAVING COUNT(*) = 1
+ 
+ORDER BY  [InvoiceNo],[HSeqNo],[DSeqNo]
+
+END
+ELSE
+BEGIN
+ INSERT INTO #temp_PortalInvoiceHistoryDetail
+ SELECT
+	TimeSync,
+	'C' as Operation,
+	[InvoiceNo],[HSeqNo],[DSeqNo],[ItemCode],[Quantity],[UnitPrice],[Total]
+  FROM #temp_PortalInvoiceHistoryDetail_Current
+  WHERE RepCode = @RepCode
+END
+if @@ROWCOUNT>0
+BEGIN
+DELETE FROM PortalInvoiceHistoryDetail_Previous where RepCode = @RepCode
+INSERT PortalInvoiceHistoryDetail_Previous(TimeSync, RepCode,[InvoiceNo],[HSeqNo],[DSeqNo],[ItemCode],[Quantity],[UnitPrice],[Total])
+SELECT
+	TimeSync,
+	RepCode,
+	[InvoiceNo],[HSeqNo],[DSeqNo],[ItemCode],[Quantity],[UnitPrice],[Total]
+FROM #temp_PortalInvoiceHistoryDetail_Current
+WHERE RepCode = @RepCode
+END
 
 END
