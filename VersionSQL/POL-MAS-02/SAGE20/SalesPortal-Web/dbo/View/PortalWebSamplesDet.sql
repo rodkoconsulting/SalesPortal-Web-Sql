@@ -1,10 +1,11 @@
 ﻿/****** Object:  View [dbo].[PortalWebSamplesDet]    Committed by VersionSQL https://www.versionsql.com ******/
 
-CREATE VIEW dbo.PortalWebSamplesDet AS
+CREATE VIEW [dbo].[PortalWebSamplesDet] AS
 SELECT			DISTINCT h.PurchaseOrderNo AS PoNo
 				, d.ItemCode AS Code
 				, CONVERT(DECIMAL(9,4),(ROUND(d.QuantityOrdered,4))) AS Qty
 				, CONVERT(DECIMAL(9,2),(ROUND(d.QuantityOrdered * d.UnitCost,2))) AS Cost
+				, d.CommentText as ItemComment
 FROM         MAS_POL.dbo.PO_PurchaseOrderHeader h INNER JOIN
                       MAS_POL.dbo.PO_PurchaseOrderDetail d ON 
                       h.PurchaseOrderNo = d.PurchaseOrderNo INNER JOIN
