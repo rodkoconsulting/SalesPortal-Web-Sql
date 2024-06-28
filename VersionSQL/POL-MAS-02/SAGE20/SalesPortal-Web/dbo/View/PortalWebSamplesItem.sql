@@ -7,9 +7,9 @@ SELECT 			DISTINCT s.SalespersonNo as RepNo
 				, IsNull(r.UDF_REGION,'') as Reg
 				, IsNull(ap.UDF_NAME,'') as App
 				, i.UDF_BRAND_NAMES as Brnd
-				, i.UDF_BRAND_NAMES + ' ' + i.UDF_DESCRIPTION + ' ' + i.UDF_VINTAGE + ' (' + REPLACE(i.SalesUnitOfMeasure, 'C', '') + '/' + (CASE WHEN CHARINDEX('ML', 
+				, Trim(i.UDF_BRAND_NAMES + ' ' + i.UDF_DESCRIPTION + ' ' + i.UDF_VINTAGE + ' (' + REPLACE(i.SalesUnitOfMeasure, 'C', '') + '/' + (CASE WHEN CHARINDEX('ML', 
                       i.UDF_BOTTLE_SIZE) > 0 THEN REPLACE(i.UDF_BOTTLE_SIZE, ' ML', '') ELSE REPLACE(i.UDF_BOTTLE_SIZE, ' ', '') END) 
-                      + ') ' + i.UDF_DAMAGED_NOTES as 'Desc'
+                      + ') ' + i.UDF_DAMAGED_NOTES) as 'Desc'
 				, v.VENDORNAME as Vend
 				, v.UDF_MASTER_VENDOR AS Mv
 				, CASE WHEN i.UDF_SAMPLE_FOCUS='Y' THEN 'x' ELSE '' END AS 'Foc'
