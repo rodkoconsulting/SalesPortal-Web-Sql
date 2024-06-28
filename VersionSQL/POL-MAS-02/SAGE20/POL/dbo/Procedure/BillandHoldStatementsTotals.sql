@@ -14,6 +14,6 @@ BEGIN
 	WHERE s.OrderDate  < @StatementDate
 	GROUP BY s.ARDivisionNo, s.CustomerNo
 	)
-	SELECT ARDivisionNo, CustomerNo, ROUND(Quantity * .73, 2) AS Fee
+	SELECT ARDivisionNo, CustomerNo, ROUND(Quantity * .74, 2) AS Fee
 	FROM line
 END
