@@ -1,6 +1,6 @@
 ﻿/****** Object:  Procedure [dbo].[PortalWebPivotSalesProc]    Committed by VersionSQL https://www.versionsql.com ******/
 
-CREATE PROCEDURE [dbo].[PivotSales_Proc]
+CREATE PROCEDURE [dbo].[PortalWebPivotSalesProc]
 	-- Add the parameters for the stored procedure here
 	@UserName varchar(25),
 	@CurrentStart varchar(8),
@@ -24,30 +24,30 @@ BEGIN
 	SELECT @AccountType = AccountType FROM Web_ActiveUsers where UserName=@UserName   
 	SELECT Main = (
 	SELECT  
-			IsNull(pl.ProductLineDesc,'') as ProductLine
-			, IsNull(i.UDF_MASTER_VENDOR, '') as MasterVendor
-			, IsNull(v.VendorName, '') as Vendor
+			IsNull(pl.ProductLineDesc,'') as PL
+			, IsNull(i.UDF_MASTER_VENDOR, '') as MV
+			, IsNull(v.VendorName, '') as Ven
 			, IsNull(i.UDF_BRAND, '') as Brand
-			, IsNull(i.UDF_COUNTRY, '') as Country
-			, IsNull(i.UDF_REGION, '') as Region
-			, IsNull(i.UDF_SUBREGION_T, '') as Appellation
-			, MAX(CASE WHEN IsNull(i.UDF_SAMPLE_FOCUS,'') = 'Y' THEN 'Y' ELSE '' END) as Focus
-			, c.CustomerNo
-			, c.CustomerName as Customer
-			, c.UDF_AFFILIATIONS as Affiliations
-			, c.SortField as Premise
+			, IsNull(i.UDF_COUNTRY, '') as Cntry
+			, IsNull(i.UDF_REGION, '') as Reg
+			, IsNull(i.UDF_SUBREGION_T, '') as App
+			, MAX(CASE WHEN IsNull(i.UDF_SAMPLE_FOCUS,'') = 'Y' THEN 'Y' ELSE '' END) as Foc
+			, c.CustomerNo as CustNo
+			, c.CustomerName as Cust
+			, c.UDF_AFFILIATIONS as Aff
+			, c.SortField as Prem
 			, sp.SalespersonNo as Rep
-			, sp.UDF_TERRITORY as RepTerritory
-			, s.UDF_TERRITORY AS CustTerritory
-			, sh.UDF_COUNTY as County
+			, sp.UDF_TERRITORY as RepTerr
+			, s.UDF_TERRITORY AS CustTerr
+			, sh.UDF_COUNTY as Cnty
 			, c.UDF_PREMISIS_CITY as City
 			, c.UDF_PREMISIS_STATE as State
 			, c.UDF_PREMISIS_ZIP as Zip
 			, IsNull(i.UDF_BRAND_NAMES +' '+ i.UDF_DESCRIPTION +' ('+ REPLACE(i.SalesUnitOfMeasure,'C','')+'/'+ (CASE WHEN CHARINDEX('ML',i.UDF_BOTTLE_SIZE)>0 THEN REPLACE(i.UDF_BOTTLE_SIZE,' ML','') ELSE REPLACE(i.UDF_BOTTLE_SIZE,' ','') END)+')', '') as 'Desc'
-			, CONVERT(DECIMAL(9,2),(ROUND(SUM(CASE WHEN h.TransactionDate between @PreviousStartDate and @PreviousEndDate THEN d.QuantityShipped ELSE 0 END), 2))) as PriorYrCase
-			, CONVERT(DECIMAL(9,2),(ROUND(SUM(CASE WHEN h.TransactionDate between @CurrentStartDate and @CurrentEndDate THEN d.QuantityShipped ELSE 0 END), 2))) as CurrentYrCase
-			, CONVERT(DECIMAL(9,2),(ROUND(SUM(CASE WHEN h.TransactionDate between @PreviousStartDate and @PreviousEndDate THEN d.ExtensionAmt ELSE 0 END), 2))) as PriorYrDol
-			, CONVERT(DECIMAL(9,2),(ROUND(SUM(CASE WHEN h.TransactionDate between @CurrentStartDate and @CurrentEndDate THEN d.ExtensionAmt ELSE 0 END), 2))) as CurrentYrDol
+			, CONVERT(DECIMAL(9,2),(ROUND(SUM(CASE WHEN h.TransactionDate between @PreviousStartDate and @PreviousEndDate THEN d.QuantityShipped ELSE 0 END), 2))) as PriorCase
+			, CONVERT(DECIMAL(9,2),(ROUND(SUM(CASE WHEN h.TransactionDate between @CurrentStartDate and @CurrentEndDate THEN d.QuantityShipped ELSE 0 END), 2))) as CurrCase
+			, CONVERT(DECIMAL(9,2),(ROUND(SUM(CASE WHEN h.TransactionDate between @PreviousStartDate and @PreviousEndDate THEN d.ExtensionAmt ELSE 0 END), 2))) as PriorDol
+			, CONVERT(DECIMAL(9,2),(ROUND(SUM(CASE WHEN h.TransactionDate between @CurrentStartDate and @CurrentEndDate THEN d.ExtensionAmt ELSE 0 END), 2))) as CurrDol
 		FROM            MAS_POL.dbo.AP_Vendor v RIGHT OUTER JOIN MAS_POL.dbo.CI_Item i LEFT OUTER JOIN
                          MAS_POL.dbo.IM_ProductLine pl ON i.ProductLine = pl.ProductLine ON v.APDivisionNo = i.PrimaryAPDivisionNo AND v.VendorNo = i.PrimaryVendorNo RIGHT OUTER JOIN
                          MAS_POL.dbo.AR_InvoiceHistoryDetail d RIGHT OUTER JOIN
