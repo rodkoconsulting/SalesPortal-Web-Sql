@@ -5,8 +5,8 @@ CREATE PROCEDURE [dbo].[PortalWebPivotSalesProc]
 	@UserName varchar(25),
 	@CurrentStart varchar(8),
 	@CurrentEnd varchar(8),
-	@PreviousStart varchar(8),
-	@PreviousEnd varchar(8)
+	@PriorStart varchar(8),
+	@PriorEnd varchar(8)
 AS
 BEGIN
 	SET NOCOUNT ON
@@ -14,12 +14,12 @@ BEGIN
 	DECLARE @AccountType char(3);
 	DECLARE @CurrentStartDate date;
 	DECLARE @CurrentEndDate date;
-	DECLARE @PreviousStartDate date;
-	DECLARE @PreviousEndDate date;
+	DECLARE @PriorStartDate date;
+	DECLARE @PriorEndDate date;
 	SELECT @CurrentStartDate = TRY_CAST(@CurrentStart as date);
 	SELECT @CurrentEndDate = TRY_CAST(@CurrentEnd as date);
-	SELECT @PreviousStartDate = TRY_CAST(@PreviousStart as date);
-	SELECT @PreviousEndDate = TRY_CAST(@PreviousEnd as date);
+	SELECT @PriorStartDate = TRY_CAST(@PriorStart as date);
+	SELECT @PriorEndDate = TRY_CAST(@PriorEnd as date);
 	SELECT @RepCode = RepCode FROM Web_ActiveUsers where UserName=@UserName
 	SELECT @AccountType = AccountType FROM Web_ActiveUsers where UserName=@UserName   
 	SELECT Main = (
@@ -44,9 +44,9 @@ BEGIN
 			, c.UDF_PREMISIS_STATE as State
 			, c.UDF_PREMISIS_ZIP as Zip
 			, IsNull(i.UDF_BRAND_NAMES +' '+ i.UDF_DESCRIPTION +' ('+ REPLACE(i.SalesUnitOfMeasure,'C','')+'/'+ (CASE WHEN CHARINDEX('ML',i.UDF_BOTTLE_SIZE)>0 THEN REPLACE(i.UDF_BOTTLE_SIZE,' ML','') ELSE REPLACE(i.UDF_BOTTLE_SIZE,' ','') END)+')', '') as 'Desc'
-			, CONVERT(DECIMAL(9,2),(ROUND(SUM(CASE WHEN h.TransactionDate between @PreviousStartDate and @PreviousEndDate THEN d.QuantityShipped ELSE 0 END), 2))) as PriorCase
+			, CONVERT(DECIMAL(9,2),(ROUND(SUM(CASE WHEN h.TransactionDate between @PriorStartDate and @PriorEndDate THEN d.QuantityShipped ELSE 0 END), 2))) as PriorCase
 			, CONVERT(DECIMAL(9,2),(ROUND(SUM(CASE WHEN h.TransactionDate between @CurrentStartDate and @CurrentEndDate THEN d.QuantityShipped ELSE 0 END), 2))) as CurrCase
-			, CONVERT(DECIMAL(9,2),(ROUND(SUM(CASE WHEN h.TransactionDate between @PreviousStartDate and @PreviousEndDate THEN d.ExtensionAmt ELSE 0 END), 2))) as PriorDol
+			, CONVERT(DECIMAL(9,2),(ROUND(SUM(CASE WHEN h.TransactionDate between @PriorStartDate and @PriorEndDate THEN d.ExtensionAmt ELSE 0 END), 2))) as PriorDol
 			, CONVERT(DECIMAL(9,2),(ROUND(SUM(CASE WHEN h.TransactionDate between @CurrentStartDate and @CurrentEndDate THEN d.ExtensionAmt ELSE 0 END), 2))) as CurrDol
 		FROM            MAS_POL.dbo.AP_Vendor v RIGHT OUTER JOIN MAS_POL.dbo.CI_Item i LEFT OUTER JOIN
                          MAS_POL.dbo.IM_ProductLine pl ON i.ProductLine = pl.ProductLine ON v.APDivisionNo = i.PrimaryAPDivisionNo AND v.VendorNo = i.PrimaryVendorNo RIGHT OUTER JOIN
@@ -64,7 +64,7 @@ BEGIN
 					(
 						h.InvoiceNo IS NULL OR
 						(
-							h.TransactionDate between @PreviousStartDate and @CurrentEndDate AND
+							h.TransactionDate between @PriorStartDate and @CurrentEndDate AND
 							h.ModuleCode = 'S/O' AND
 							d.ItemType = '1' AND
 							d.UnitPrice > 0 AND
