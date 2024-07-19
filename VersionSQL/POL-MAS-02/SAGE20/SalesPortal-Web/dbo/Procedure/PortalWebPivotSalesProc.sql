@@ -64,7 +64,7 @@ BEGIN
 					(
 						h.InvoiceNo IS NULL OR
 						(
-							h.TransactionDate between @PriorStartDate and @CurrentEndDate AND
+							(h.TransactionDate between @PriorStartDate and @PriorEndDate OR h.TransactionDate between @CurrentStartDate and @CurrentEndDate) AND
 							h.ModuleCode = 'S/O' AND
 							d.ItemType = '1' AND
 							d.UnitPrice > 0 AND
