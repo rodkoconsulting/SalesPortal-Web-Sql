@@ -6,9 +6,10 @@ SELECT        iw.ItemCode as [Item Code]
 				, i.UDF_DESCRIPTION as [Item Name]
 				, b.UDF_BRAND_NAME as [Producer Name]
 				, i.UDF_VINTAGE as [Vintage]
-				, CASE WHEN CHARINDEX('ML',i.UDF_BOTTLE_SIZE)>0 THEN ISNULL(TRY_CONVERT(int, REPLACE(i.UDF_BOTTLE_SIZE,' ML','')),750) ELSE 1000 * ISNULL(TRY_CONVERT(float, REPLACE(i.UDF_BOTTLE_SIZE,' L','')),1.5) END as [Bottle/Container Size]
-				, REPLACE(i.SalesUnitOfMeasure, 'C', '') as [Pack size]
+				, CASE WHEN CHARINDEX('ML',i.UDF_BOTTLE_SIZE)>0 THEN ISNULL(TRY_CONVERT(int, REPLACE(i.UDF_BOTTLE_SIZE,' ML','')),750) ELSE 1000 * ISNULL(TRY_CONVERT(float, REPLACE(i.UDF_BOTTLE_SIZE,' L','')),1.5) END as [Bottle Size]
+				, REPLACE(i.SalesUnitOfMeasure, 'C', '') as [Pack Size]
 				, SUM(TRY_CONVERT(int, (iw.QuantityOnHand * ISNULL(TRY_CONVERT(int, REPLACE(i.SalesUnitOfMeasure, 'C', '')),12)), 0)) as [Qty in Bottles]
+				, CONVERT(date, GetDate()) as [Report Date]
 				, w.WarehouseName as [Warehouse Location]
 FROM            MAS_POL.dbo.IM_ItemWarehouse iw INNER JOIN
                          MAS_POL.dbo.CI_Item i ON iw.ItemCode = i.ItemCode INNER JOIN
