@@ -18,6 +18,7 @@ SELECT
 				, CASE WHEN c.CustomerType IS NULL THEN ''
 					WHEN RIGHT(c.CustomerType, 2) = 'ON' THEN 'On'
 					ELSE 'Off' END as 'Premise'
+				, IsNull(c.UDF_AFFILIATIONS, '') AS 'Affiliations'
 				, IsNull(c.UDF_PREMISIS_ADDRESS_LINE_1, '') AS 'Address 1'
 				, IsNull(c.UDF_PREMISIS_ADDRESS_LINE_2, '') AS 'Address 2'
 				, IsNull(c.UDF_PREMISIS_CITY, '') AS 'City'
@@ -44,6 +45,7 @@ GROUP BY t.ItemCode
 			, t.ArDivisionNo
 			, t.CustomerNo
 			, c.CustomerType
+			, c.UDF_AFFILIATIONS
 			, c.UDF_PREMISIS_ADDRESS_LINE_1
 			, c.UDF_PREMISIS_ADDRESS_LINE_2
 			, c.UDF_PREMISIS_CITY
