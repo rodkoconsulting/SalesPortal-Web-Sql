@@ -1,6 +1,6 @@
-﻿/****** Object:  View [dbo].[PortalWebOrdersMain]    Committed by VersionSQL https://www.versionsql.com ******/
+﻿/****** Object:  View [dbo].[PortalWebOrdersMain_old]    Committed by VersionSQL https://www.versionsql.com ******/
 
-CREATE VIEW [dbo].[PortalWebOrdersMain]
+CREATE VIEW [dbo].[PortalWebOrdersMain_old]
 AS
 WITH Po AS
 (
@@ -27,6 +27,8 @@ SELECT     h.SalespersonNo as Rep
 		   ,h.InvoiceNo as OrderNo
 		   ,CASE WHEN YEAR(OrderDate)<2000 THEN ShipDate ELSE OrderDate END as OrderDate
 		   ,ShipDate
+
+		   ,'' AS ArrivalDate
 		   ,CASE WHEN Comment LIKE '%BILL & HOLD INVOICE%' THEN 'BHI'
 				WHEN Comment LIKE '%BILL & HOLD%' AND d.ExtensionAmt > 0 and OrderType = '1' THEN 'BHI'
 				WHEN Comment LIKE '%BILL & HOLD TRANSFER%' THEN 'BHT'
@@ -49,6 +51,7 @@ SELECT     h.SalespersonNo as Rep
 		   ,h.SalesOrderNo as OrderNo
 		   ,OrderDate
 		   ,ShipExpireDate as ShipDate
+		   ,CASE WHEN CANCELREASONCODE = 'IN' THEN UDF_ARRIVAL_DATE ELSE '' END AS ArrivalDate
 		   ,CASE WHEN d.ExtensionAmt = 0 AND Comment NOT LIKE '%B&H HOLD%' AND CancelReasonCode IN ('NSQTY','NOTE','PO','') THEN 'BHS'
 				 WHEN d.ExtensionAmt = 0 AND CancelReasonCode IN ('NSQTY','APP','NOTE','CRED','BH') THEN 'BHH'
 				 WHEN CancelReasonCode IN ('IN') THEN 'BO'
@@ -72,6 +75,7 @@ SELECT     h.SalespersonNo as Rep
 		   ,h.InvoiceNo as OrderNo
 		   ,CASE WHEN Year(OrderDate) > 1900 THEN OrderDate ELSE InvoiceDate END AS OrderDate
 		   ,InvoiceDate as ShipDate
+		   ,'' AS ArrivalDate
 		   ,'I' as OrderType
 		   ,'' as HoldCode
 		   ,UDF_NJ_COOP as CoopNo
@@ -91,6 +95,7 @@ SELECT	   a.UDF_REP_CODE as Rep
 		   ,po.PurchaseOrderNo as OrderNo
 		   ,PurchaseOrderDate as OrderDate
 		   ,RequiredExpireDate as ShipDate
+		   , '' AS ArrivalDate
 		   ,'SM' as OrderType
 		   ,'SM' as HoldCode
 		   ,'' as CoopNo
@@ -109,10 +114,9 @@ SELECT
 	,OrderType as Typ
 	,HoldCode as Hold
 	,CONVERT(varchar,OrderDate,23) as OrdDate
-	,CASE WHEN HoldCode NOT IN ('MO','IN','BH','BO') THEN CONVERT(varchar,ShipDate,23) ELSE '' END AS ShpDate
+	,CASE WHEN HoldCode NOT IN ('MO','IN','BH') THEN CONVERT(varchar,ShipDate,23) ELSE '' END AS ShpDate
 	,CASE WHEN HoldCode IN ('MO','IN','BH') THEN CONVERT(varchar,ShipDate,23) ELSE '' END AS ExpDate
-	,CASE WHEN YEAR(i.LastReceiptDate)>1900 THEN CONVERT(varchar,LastReceiptDate,23) ELSE '' END as ArrDate
-	,i.ItemCode
+	,CASE WHEN ArrivalDate !='' THEN CONVERT(varchar,ArrivalDate,23) ELSE '' END as ArrDate
 	,o.Comment as Cmt
 	,CoopNo as Coop
 	,UDF_TERRITORY AS Ter
@@ -120,5 +124,4 @@ SELECT
 	,o.ShipTo as ShpTo
 	FROM ORDERS o
 INNER JOIN MAS_POL.dbo.AR_Salesperson s ON o.Rep = s.SalespersonNo and o.RepDiv = s.SalespersonDivisionNo
-INNER JOIN MAS_POL.dbo.CI_Item i ON o.ItemCode = i.ItemCode
 WHERE o.ItemCode NOT IN ('/COBRA')

@@ -1,6 +1,6 @@
-﻿/****** Object:  View [dbo].[PortalWebOrdersMain]    Committed by VersionSQL https://www.versionsql.com ******/
+﻿/****** Object:  View [dbo].[PortalWebOrdersMain_new]    Committed by VersionSQL https://www.versionsql.com ******/
 
-CREATE VIEW [dbo].[PortalWebOrdersMain]
+CREATE VIEW [dbo].[PortalWebOrdersMain_new]
 AS
 WITH Po AS
 (
@@ -109,7 +109,7 @@ SELECT
 	,OrderType as Typ
 	,HoldCode as Hold
 	,CONVERT(varchar,OrderDate,23) as OrdDate
-	,CASE WHEN HoldCode NOT IN ('MO','IN','BH','BO') THEN CONVERT(varchar,ShipDate,23) ELSE '' END AS ShpDate
+	,CASE WHEN HoldCode NOT IN ('MO','IN','BH') THEN CONVERT(varchar,ShipDate,23) ELSE '' END AS ShpDate
 	,CASE WHEN HoldCode IN ('MO','IN','BH') THEN CONVERT(varchar,ShipDate,23) ELSE '' END AS ExpDate
 	,CASE WHEN YEAR(i.LastReceiptDate)>1900 THEN CONVERT(varchar,LastReceiptDate,23) ELSE '' END as ArrDate
 	,i.ItemCode

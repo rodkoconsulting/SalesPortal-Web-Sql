@@ -1,6 +1,6 @@
 ﻿/****** Object:  Procedure [dbo].[PortalWebOrdersProc_new]    Committed by VersionSQL https://www.versionsql.com ******/
 
-CREATE PROCEDURE dbo.PortalWebOrdersProc_new
+CREATE PROCEDURE [dbo].[PortalWebOrdersProc_new]
 	-- Add the parameters for the stored procedure here
 	@UserName varchar(25)
 AS
@@ -35,7 +35,7 @@ SELECT Main = (SELECT
 	  ,BoEta
 	  ,AvailCmt
   FROM [dbo].[PortalWebOrdersMain] h INNER JOIN
-  [dbo].[PortalWebOrdersDet] Det on h.OrdNo = Det.OrdNo
+  [dbo].[PortalWebOrdersDet] Det on h.OrdNo = Det.OrdNo and h.ItemCode = Det.Item
 where ((@AccountType = 'REP' and h.Rep = @RepCode) or (@AccountType = 'OFF') )
 order by h.OrdNo
 FOR JSON AUTO
