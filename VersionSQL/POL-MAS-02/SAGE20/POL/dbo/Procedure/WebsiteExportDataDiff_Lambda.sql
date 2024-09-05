@@ -5,7 +5,7 @@
 -- Create date: <Create Date,,>
 -- Description:	<Description,,>
 -- =============================================
-CREATE PROCEDURE dbo.WebsiteExportDataDiff_Lambda 
+CREATE PROCEDURE [dbo].[WebsiteExportDataDiff_Lambda] 
 	-- Add the parameters for the stored procedure here
 AS
 BEGIN
@@ -28,6 +28,7 @@ BEGIN
                         [Notes - Vineyard], [Notes - Orientation], [Notes - Soil], [Notes - Viticulture], [Notes - Vinification],
                         [Notes - Aging Process], [Notes - Production], [Notes - Tasting],
                         [ImageFile],
+						[ShelfTalker],
                         [Natural],
                         [Regen],
                         [Vegan],
