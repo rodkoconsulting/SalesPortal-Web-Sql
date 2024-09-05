@@ -11,7 +11,7 @@ BEGIN
 DECLARE @errordescription varchar(50);
 DECLARE @emailbody varchar(2000);
 SELECT @errordescription=ErrorDescription FROM SP_ERRORLOG_INFO WHERE ErrorCode=@ErrorNumber;
-SET @emailbody = 'Order Number: '+@OrderNumber+char(13)+'Item Number: '+@ItemNumber+char(13)+'Quantity Ordered: '+@QuantityOrdered+char(13)+'Error: '+@errordescription
+SET @emailbody = 'Order Number: '+@OrderNumber+char(13)+char(10)+'Item Number: '+@ItemNumber+char(13)+char(10)+'Quantity Ordered: '+@QuantityOrdered+char(13)+char(10)+'Error: '+@errordescription
 EXEC msdb.dbo.sp_send_dbmail @profile_name='SP_Error_log',
 @recipients='orders@polanerselections.com',
 @subject=@EmailSubject,
