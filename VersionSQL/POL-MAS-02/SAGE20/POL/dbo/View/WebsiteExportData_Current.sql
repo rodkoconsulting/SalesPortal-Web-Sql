@@ -28,6 +28,7 @@ SELECT     dbo.Website_Export_BaseItemCode.[Base Item Code] AS [Item Code], dbo.
                       IsNull(dbo.SuperTrimLeft(MAS_POL.dbo.CI_ITEM.UDF_NOTES_PRODUCTION),'') AS [Notes - Production],
                       IsNull(dbo.SuperTrimLeft(MAS_POL.dbo.CI_ITEM.UDF_NOTES_TASTING),'') AS [Notes - Tasting],
                       MAS_POL.dbo.CI_ITEM.IMAGEFILE as ImageFile,
+					  IsNull(MAS_POL.dbo.CI_ITEM.UDF_SHELF_TALKER,'') as ShelfTalker,
 					  IsNull(MAS_POL.dbo.CI_ITEM.UDF_NATURAL,'N') as Natural,
 					  IsNull(MAS_POL.dbo.CI_ITEM.UDF_REGENERATIVE,'N') as Regen,
 					  IsNull(MAS_POL.dbo.CI_ITEM.UDF_VEGAN,'N') as Vegan,
