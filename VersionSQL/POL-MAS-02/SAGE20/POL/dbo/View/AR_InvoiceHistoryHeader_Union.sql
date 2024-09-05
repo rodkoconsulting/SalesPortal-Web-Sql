@@ -2,11 +2,11 @@
 
 CREATE VIEW [dbo].[AR_InvoiceHistoryHeader_Union]
 AS
-SELECT       InvoiceNo, HeaderSeqNo, InvoiceType, InvoiceDate, TransactionDate, ARDivisionNo, CustomerNo, SalesPersonDivisionNo, SalesPersonNo, Comment, UDF_NJ_COOP, ShipToName, ShipVia
+SELECT       InvoiceNo, HeaderSeqNo, InvoiceType, InvoiceDate, TransactionDate, ARDivisionNo, CustomerNo, SalesPersonDivisionNo, SalesPersonNo, Comment, UDF_NJ_COOP, ShipToName, ShipVia, UDF_IS_BH_INV
 FROM            MAS_POL.dbo.AR_InvoiceHistoryHeader
 WHERE ModuleCode = 'S/O'
 UNION ALL
-SELECT        InvoiceNo, InvoiceNo as HeaderSeqNo, InvoiceType, ShipDate as InvoiceDate, ShipDate as TransactionDate, i.ARDivisionNo, i.CustomerNo, i.SalesPersonDivisionNo, i.SalesPersonNo, i.Comment, IsNull(o.UDF_NJ_COOP,'') as UDF_NJ_COOP, i.ShipToName, i.ShipVia
+SELECT        InvoiceNo, InvoiceNo as HeaderSeqNo, InvoiceType, ShipDate as InvoiceDate, ShipDate as TransactionDate, i.ARDivisionNo, i.CustomerNo, i.SalesPersonDivisionNo, i.SalesPersonNo, i.Comment, IsNull(o.UDF_NJ_COOP,'') as UDF_NJ_COOP, i.ShipToName, i.ShipVia, UDF_IS_BH_INV
 FROM            MAS_POL.dbo.SO_InvoiceHeader i LEFT OUTER JOIN MAS_POL.dbo.SO_SalesOrderHeader o on i.SalesOrderNo = o.SalesOrderNo
 
 EXECUTE sys.sp_addextendedproperty @name = N'MS_DiagramPane1', @value = N'[0E232FF0-B466-11cf-A24F-00AA00A3EFFF, 1.00]
