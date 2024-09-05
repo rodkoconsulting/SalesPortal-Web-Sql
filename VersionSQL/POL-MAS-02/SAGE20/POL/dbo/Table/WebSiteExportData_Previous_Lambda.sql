@@ -1,6 +1,6 @@
 ﻿/****** Object:  Table [dbo].[WebSiteExportData_Previous_Lambda]    Committed by VersionSQL https://www.versionsql.com ******/
 
-CREATE TABLE dbo.WebSiteExportData_Previous_Lambda(
+CREATE TABLE [dbo].[WebSiteExportData_Previous_Lambda](
 	[Item Code] [varchar](30) NULL,
 	[Vendor] [varchar](78) NULL,
 	[Description] [varchar](136) NULL,
@@ -38,5 +38,8 @@ CREATE TABLE dbo.WebSiteExportData_Previous_Lambda(
 	[Natural] [varchar](1) NOT NULL,
 	[Regen] [varchar](1) NOT NULL,
 	[Vegan] [varchar](1) NOT NULL,
-	[HauteValeur] [varchar](1) NOT NULL
+	[HauteValeur] [varchar](1) NOT NULL,
+	[ShelfTalker] [varchar](30) NOT NULL
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+
+ALTER TABLE [dbo].[WebSiteExportData_Previous_Lambda] ADD  CONSTRAINT [DF_WebSiteExportData_Previous_Lambda_ShelfTalker]  DEFAULT ('') FOR [ShelfTalker]
