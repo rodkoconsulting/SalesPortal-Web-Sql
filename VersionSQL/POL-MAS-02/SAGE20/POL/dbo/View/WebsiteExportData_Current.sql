@@ -28,11 +28,11 @@ SELECT     dbo.Website_Export_BaseItemCode.[Base Item Code] AS [Item Code], dbo.
                       IsNull(dbo.SuperTrimLeft(MAS_POL.dbo.CI_ITEM.UDF_NOTES_PRODUCTION),'') AS [Notes - Production],
                       IsNull(dbo.SuperTrimLeft(MAS_POL.dbo.CI_ITEM.UDF_NOTES_TASTING),'') AS [Notes - Tasting],
                       MAS_POL.dbo.CI_ITEM.IMAGEFILE as ImageFile,
-					  IsNull(MAS_POL.dbo.CI_ITEM.UDF_SHELF_TALKER,'') as ShelfTalker,
 					  IsNull(MAS_POL.dbo.CI_ITEM.UDF_NATURAL,'N') as Natural,
 					  IsNull(MAS_POL.dbo.CI_ITEM.UDF_REGENERATIVE,'N') as Regen,
 					  IsNull(MAS_POL.dbo.CI_ITEM.UDF_VEGAN,'N') as Vegan,
-					  IsNull(MAS_POL.dbo.CI_ITEM.UDF_HAUTE_VALEUR,'N') as HauteValeur
+					  IsNull(MAS_POL.dbo.CI_ITEM.UDF_HAUTE_VALEUR,'N') as HauteValeur,
+					  IsNull(MAS_POL.dbo.CI_ITEM.UDF_SHELF_TALKER,'') as ShelfTalker
 FROM         dbo.Website_Export_Grouping_BottleSize INNER JOIN
                       MAS_POL.dbo.CI_ITEM ON dbo.Website_Export_Grouping_BottleSize.[Item Code] = MAS_POL.dbo.CI_ITEM.ITEMCODE INNER JOIN
                       dbo.Website_Export_BaseItemCode ON dbo.Website_Export_Grouping_BottleSize.Vendor = dbo.Website_Export_BaseItemCode.Vendor AND 
