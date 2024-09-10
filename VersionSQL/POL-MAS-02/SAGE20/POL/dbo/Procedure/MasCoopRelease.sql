@@ -6,9 +6,10 @@ CREATE PROCEDURE [dbo].[MasCoopRelease]
 AS
 begin try
 UPDATE SO_CoopRelease
-SET OrderStatus = Case When [UDF_REVIEW_CREDIT] = 'N' OR [UDF_REVIEW_PO] = 'N' then 'H' else 'O' End,
+SET OrderStatus = Case When [UDF_REVIEW_CREDIT] = 'N' OR [UDF_REVIEW_PO] = 'N' OR [UDF_REVIEW_NOTES] = 'N' then 'H' else 'O' End,
 	CancelReasonCode = Case When [UDF_REVIEW_CREDIT] = 'N' Then 'CRED'
 							When  [UDF_REVIEW_PO] = 'N' Then 'PO'
+							When  [UDF_REVIEW_NOTES] = 'N' Then 'NOTE'
 							Else ''
 							End,
 	[UDF_REVIEW_COOP] = 'Y'

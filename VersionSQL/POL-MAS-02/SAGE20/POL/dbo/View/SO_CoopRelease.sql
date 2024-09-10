@@ -5,7 +5,9 @@ AS
 SELECT     MAS_POL.dbo.SO_SalesOrderHeader.OrderStatus, MAS_POL.dbo.SO_SalesOrderHeader.CancelReasonCode, MAS_POL.dbo.SO_SalesOrderHeader.ShipExpireDate, 
                       MAS_POL.dbo.SO_SalesOrderHeader.SalesOrderNo, MAS_POL.dbo.SO_SalesOrderHeader.UDF_REVIEW_CREDIT, 
                       MAS_POL.dbo.SO_SalesOrderHeader.UDF_REVIEW_PO, 
-                      MAS_POL.dbo.SO_SalesOrderHeader.UDF_REVIEW_COOP, MAS_POL.dbo.SO_SalesOrderHeader.UDF_NJ_COOP
+                      MAS_POL.dbo.SO_SalesOrderHeader.UDF_REVIEW_COOP
+					  ,MAS_POL.dbo.SO_SalesOrderHeader.UDF_NJ_COOP
+					  ,MAS_POL.dbo.SO_SalesOrderHeader.UDF_REVIEW_NOTES
 FROM         MAS_POL.dbo.SO_SalesOrderHeader WITH ( NOLOCK )
 WHERE   CancelReasonCode = 'COOP'
 
