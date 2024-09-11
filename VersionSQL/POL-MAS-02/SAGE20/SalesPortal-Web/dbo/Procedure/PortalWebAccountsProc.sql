@@ -52,7 +52,7 @@ SELECT		c.ARDivisionNo+c.CustomerNo as AcctNo
 				WHEN (AGINGCATEGORY1 + AGINGCATEGORY2 + AGINGCATEGORY3 + AGINGCATEGORY4) > 0 THEN 'P'
 				ELSE '' END AS [Status]
 			, CASE WHEN @AccountType <> 'REP' THEN c.SalespersonNo ELSE '' END as Rep
-			, CASE WHEN UDF_TERRITORY IN ('NY Metro','NY Long Island','NY Upstate','NY Westchester / Hudson','NJ','Pennsylvania') THEN UDF_TERRITORY ELSE 'Manager' END AS Region
+			, CASE WHEN s.UDF_TERRITORY IN ('NY Metro','NY Long Island','NY Upstate','NY Westchester / Hudson','NJ','Pennsylvania') THEN s.UDF_TERRITORY ELSE 'Manager' END AS Region
 			, CONVERT(DECIMAL(9,2),(ROUND(IsNull(CURRENTBALANCE+AGINGCATEGORY1+AGINGCATEGORY2+AGINGCATEGORY3+AGINGCATEGORY4,0),2))) AS Bal
 			, CONVERT(DECIMAL(9,2),(ROUND(CASE WHEN (AGINGCATEGORY1+AGINGCATEGORY2+AGINGCATEGORY3+AGINGCATEGORY4)<=0 THEN 0 ELSE(AGINGCATEGORY1+AGINGCATEGORY2+AGINGCATEGORY3+AGINGCATEGORY4) END,2))) AS Due
 			, IsNull(UDF_INSTRUCTIONS,'') AS DelNote
@@ -62,14 +62,15 @@ SELECT		c.ARDivisionNo+c.CustomerNo as AcctNo
 			, a.UDF_COUNTY as County
 			, IsNull(CONVERT(varchar, LastOrdered, 12),'') as [Last]
 			, IsNull(Notes,'') as AcctNotes,
-			UDF_REP_EMAIL_ADDRESS as RepEmail,
+			rep.EmailAddress as RepEmail,
 			c.ShipMethod as Via       
 FROM         MAS_POL.dbo.AR_Customer c INNER JOIN
              MAS_POL.dbo.SO_SHIPTOADDRESS a ON c.ARDIVISIONNO = a.ARDIVISIONNO AND c.CUSTOMERNO = a.CUSTOMERNO AND c.PRIMARYSHIPTOCODE = a.SHIPTOCODE INNER JOIN
              MAS_POL.dbo.AR_UDT_SHIPPING s ON a.UDF_REGION_CODE = s.UDF_REGION_CODE LEFT OUTER JOIN
              dbo.PortalWebAccountNotes n ON c.ARDIVISIONNO = n.ARDIVISIONNO AND c.CUSTOMERNO = n.CUSTOMERNO LEFT OUTER JOIN
-             LastOrdered o ON c.ARDIVISIONNO =o.ARDIVISIONNO AND c.CUSTOMERNO = o.CUSTOMERNO
-WHERE (PriceLevel <> '') and ((c.ARDIVISIONNO = '00') or (c.ARDIVISIONNO = '02')) and ((@AccountType = 'REP' and c.SalespersonNo = @RepCode) or ((@AccountType = 'OFF' or @AccountType = 'EXT') and c.SalespersonNo not like 'XX%'))
+             LastOrdered o ON c.ARDIVISIONNO =o.ARDIVISIONNO AND c.CUSTOMERNO = o.CUSTOMERNO INNER JOIN
+			 MAS_POL.dbo.AR_Salesperson rep ON c.SalespersonDivisionNo = rep.SalespersonDivisionNo and c.SalespersonNo = rep.SalespersonNo
+WHERE (PriceLevel <> '') and s.UDF_TERRITORY NOT IN ('Pennsylvania') AND ((c.ARDIVISIONNO = '00') or (c.ARDIVISIONNO = '02')) and ((@AccountType = 'REP' and c.SalespersonNo = @RepCode) or ((@AccountType = 'OFF' or @AccountType = 'EXT') and c.SalespersonNo not like 'XX%'))
 FOR JSON PATH
 )
 FOR JSON PATH, WITHOUT_ARRAY_WRAPPER
