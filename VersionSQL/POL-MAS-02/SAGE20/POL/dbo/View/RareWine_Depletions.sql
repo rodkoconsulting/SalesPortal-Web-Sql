@@ -2,6 +2,16 @@
 
 CREATE VIEW [dbo].[RareWine_Depletions]
 AS
+WITH FirstPurchase AS (
+SELECT        MIN(h.TransactionDate) as TransactionDate
+			, h.ARDivisionNo
+			, h.CustomerNo
+FROM            MAS_POL.dbo.AR_InvoiceHistoryHeader h INNER JOIN
+                         MAS_POL.dbo.AR_InvoiceHistoryDetail d ON h.InvoiceNo = d.InvoiceNo INNER JOIN
+						 MAS_POL.dbo.CI_Item i ON d.ItemCode = i.ItemCode
+WHERE i.UDF_MASTER_VENDOR = 'Rare Wine'
+GROUP BY ARDivisionNo, CustomerNo
+)
 SELECT    
 				CONVERT(date, t.TransactionDate) as 'Transaction Date'
 				, t.ItemCode as [Item Code]
@@ -24,15 +34,19 @@ SELECT
 				, IsNull(c.UDF_PREMISIS_CITY, '') AS 'City'
 				, IsNull(c.UDF_PREMISIS_STATE, '') AS 'State'
 				, IsNull(c.UDF_PREMISIS_ZIP, '') AS 'Zip'
+				, CASE WHEN NOT fp.TransactionDate IS NULL THEN 'X' ELSE '' END AS [NEW ACCOUNT]
+				, -t.ExtendedPrice as [SALES VALUE]
 FROM		 MAS_POL.dbo.IM_ItemTransactionHistory t INNER JOIN 
                         MAS_POL.dbo.CI_Item i ON t.ItemCode = i.ItemCode INNER JOIN
 						MAS_POL.dbo.CI_UDT_BRANDS b ON i.UDF_BRAND = b.UDF_BRAND_CODE LEFT OUTER JOIN
 						MAS_POL.dbo.AR_Customer c ON t.ARDivisionNo = c.ARDivisionNo AND t.CustomerNo = c.CustomerNo LEFT OUTER JOIN
-						MAS_POL.dbo.AR_Salesperson s ON c.SalespersonDivisionNo = s.SalespersonDivisionNo AND c.SalespersonNo = s.SalespersonNo
+						MAS_POL.dbo.AR_Salesperson s ON c.SalespersonDivisionNo = s.SalespersonDivisionNo AND c.SalespersonNo = s.SalespersonNo LEFT OUTER JOIN
+						FirstPurchase fp ON t.ARDivisionNo = fp.ARDivisionNo AND t.CustomerNo = fp.CustomerNo AND fp.TransactionDate = t.TransactionDate
 WHERE i.UDF_MASTER_VENDOR = 'Rare Wine'
 	AND i.ProductLine != 'SAMP'
 	AND t.TransactionCode IN ('SO', 'PM')
 	AND Year(t.TransactionDate) >= 2022
+	AND t.WarehouseCode != '001'
 GROUP BY t.ItemCode
 			, i.UDF_DESCRIPTION
 			, b.UDF_BRAND_NAME
@@ -52,4 +66,6 @@ GROUP BY t.ItemCode
 			, c.UDF_PREMISIS_STATE
 			, c.UDF_PREMISIS_ZIP
 			, t.TransactionDate
+			, fp.TransactionDate
+			, t.ExtendedPrice
 HAVING TRY_CONVERT(int, SUM(ROUND(-t.TransactionQty * ISNULL(TRY_CONVERT(int, REPLACE(i.SalesUnitOfMeasure, 'C', '')),12),0)),0) != 0

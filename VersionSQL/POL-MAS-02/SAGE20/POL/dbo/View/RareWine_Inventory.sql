@@ -2,6 +2,12 @@
 
 CREATE VIEW [dbo].[RareWine_Inventory]
 AS
+WITH LastSalesDate AS (
+SELECT        ItemCode, Max(TransactionDate) as [Date]
+FROM            MAS_POL.dbo.IM_ItemTransactionHistory
+WHERE        (WarehouseCode = '000') AND (TransactionCode = 'SO')
+GROUP BY ItemCode
+)
 SELECT        iw.ItemCode as [Item Code]
 				, i.UDF_DESCRIPTION as [Item Name]
 				, b.UDF_BRAND_NAME as [Producer Name]
@@ -11,10 +17,15 @@ SELECT        iw.ItemCode as [Item Code]
 				, SUM(TRY_CONVERT(int, (iw.QuantityOnHand * ISNULL(TRY_CONVERT(int, REPLACE(i.SalesUnitOfMeasure, 'C', '')),12)), 0)) as [Qty in Bottles]
 				, CONVERT(date, GetDate()) as [Report Date]
 				, w.WarehouseName as [Warehouse Location]
+				, TRY_CONVERT(int, (iw.QuantityOnPurchaseOrder * ISNULL(TRY_CONVERT(int, REPLACE(i.SalesUnitOfMeasure, 'C', '')),12)), 0) as [QUANTITY ON ORDER]
+				, p.RequiredDate as [DUE DATE]
+				, IsNull(l.Date, '') as [LAST SALE DATE]
 FROM            MAS_POL.dbo.IM_ItemWarehouse iw INNER JOIN
                          MAS_POL.dbo.CI_Item i ON iw.ItemCode = i.ItemCode INNER JOIN
                          MAS_POL.dbo.IM_Warehouse w ON iw.WarehouseCode = w.WarehouseCode INNER JOIN
-						 MAS_POL.dbo.CI_UDT_BRANDS b ON i.UDF_BRAND = b.UDF_BRAND_CODE
+						 MAS_POL.dbo.CI_UDT_BRANDS b ON i.UDF_BRAND = b.UDF_BRAND_CODE LEFT OUTER JOIN
+						 POL.dbo.PO_Inventory_ETA p ON i.ItemCode = p.ItemCode LEFT OUTER JOIN
+						 LastSalesDate l ON i.ItemCode = l.ItemCode
 WHERE i.UDF_MASTER_VENDOR = 'Rare Wine'
 	AND i.ProductLine != 'SAMP'
 	AND TRY_CONVERT(int, (iw.QuantityOnHand * ISNULL(TRY_CONVERT(int, REPLACE(i.SalesUnitOfMeasure, 'C', '')),12)), 0) > 0
@@ -25,7 +36,9 @@ GROUP BY iw.ItemCode
 			, i.UDF_BOTTLE_SIZE
 			, i.SalesUnitOfMeasure
 			, w.WarehouseName
-
+			, iw.QuantityOnPurchaseOrder
+			, p.RequiredDate
+			, l.Date
 
 EXECUTE sys.sp_addextendedproperty @name = N'MS_DiagramPane1', @value = N'[0E232FF0-B466-11cf-A24F-00AA00A3EFFF, 1.00]
 Begin DesignProperties = 
