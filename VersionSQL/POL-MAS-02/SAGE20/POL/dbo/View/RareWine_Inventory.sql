@@ -17,7 +17,7 @@ SELECT        iw.ItemCode as [Item Code]
 				, SUM(TRY_CONVERT(int, (iw.QuantityOnHand * ISNULL(TRY_CONVERT(int, REPLACE(i.SalesUnitOfMeasure, 'C', '')),12)), 0)) as [Qty in Bottles]
 				, CONVERT(date, GetDate()) as [Report Date]
 				, w.WarehouseName as [Warehouse Location]
-				, TRY_CONVERT(int, (iw.QuantityOnPurchaseOrder * ISNULL(TRY_CONVERT(int, REPLACE(i.SalesUnitOfMeasure, 'C', '')),12)), 0) as [QUANTITY ON ORDER]
+				, SUM(TRY_CONVERT(int, (iw.QuantityOnPurchaseOrder * ISNULL(TRY_CONVERT(int, REPLACE(i.SalesUnitOfMeasure, 'C', '')),12)), 0)) as [QUANTITY ON ORDER]
 				, p.RequiredDate as [DUE DATE]
 				, IsNull(l.Date, '') as [LAST SALE DATE]
 FROM            MAS_POL.dbo.IM_ItemWarehouse iw INNER JOIN
@@ -36,7 +36,6 @@ GROUP BY iw.ItemCode
 			, i.UDF_BOTTLE_SIZE
 			, i.SalesUnitOfMeasure
 			, w.WarehouseName
-			, iw.QuantityOnPurchaseOrder
 			, p.RequiredDate
 			, l.Date
 
