@@ -18,13 +18,13 @@ SELECT       DISTINCT h.InvoiceNo, h.HeaderSeqNo, InvoiceType, InvoiceDate, h.AR
 FROM            MAS_POL.dbo.AR_InvoiceHistoryHeader h INNER JOIN
 				MAS_POL.dbo.AR_InvoiceHistoryDetail d on h.InvoiceNo = d.InvoiceNo and h.HeaderSeqNo = d.HeaderSeqNo INNER JOIN 
 				MAS_POL.dbo.AR_Customer c on h.CustomerNo = c.CustomerNo and h.ARDivisionNo = c.ARDivisionNo
-WHERE ((@AccountType = 'REP' and c.SalesPersonNo = @RepCode) or (@AccountType = 'OFF') ) and ModuleCode = 'S/O' and InvoiceDate >= DATEFROMPARTS ( DATEPART(yyyy, @TodayDate) - 1, 1, 1 ) and ItemType = 1
+WHERE ((@AccountType = 'REP' and c.SalesPersonNo = @RepCode) or (@AccountType = 'OFF') ) and ModuleCode = 'S/O' and InvoiceDate >= DATEFROMPARTS ( DATEPART(yyyy, @TodayDate) - 1, 1, 1 ) and ItemCode NOT IN ('/C','/COBRA')
 UNION ALL
 SELECT        DISTINCT h.InvoiceNo, h.InvoiceNo, InvoiceType, ShipDate, h.ARDivisionNo, h.CustomerNo, c.SalesPersonNo, h.Comment, h.UDF_NJ_COOP, ItemCode, ExtensionAmt
 FROM            MAS_POL.dbo.SO_InvoiceHeader h INNER JOIN
 				MAS_POL.dbo.SO_InvoiceDetail d on h.InvoiceNo = d.InvoiceNo INNER JOIN 
 				MAS_POL.dbo.AR_Customer c on h.CustomerNo = c.CustomerNo and h.ARDivisionNo = c.ARDivisionNo
-WHERE ((@AccountType = 'REP' and c.SalesPersonNo = @RepCode) or (@AccountType = 'OFF') ) and ItemType = 1
+WHERE ((@AccountType = 'REP' and c.SalesPersonNo = @RepCode) or (@AccountType = 'OFF') ) and ItemCode NOT IN ('/C','/COBRA')
 ),
 Sales AS
 (
@@ -39,7 +39,7 @@ SELECT			c.CustomerName
 FROM            MAS_POL.dbo.AR_Salesperson s
 				INNER JOIN MAS_POL.dbo.AR_Customer c ON s.SalespersonDivisionNo = c.SalespersonDivisionNo AND s.SalespersonNo = c.SalespersonNo
 				INNER JOIN InvHist h ON c.CustomerNo = h.CustomerNo AND c.ARDivisionNo = h.ARDivisionNo
-WHERE      c.SalespersonNo NOT LIKE 'XX%' and ((@AccountType = 'REP' and c.SalesPersonNo = @RepCode) or (@AccountType = 'OFF') ) 
+WHERE      ((@AccountType = 'REP' and c.SalesPersonNo = @RepCode) or (@AccountType = 'OFF') ) 
 GROUP BY c.CustomerName, c.SalespersonNo
 )
 SELECT Main = (
