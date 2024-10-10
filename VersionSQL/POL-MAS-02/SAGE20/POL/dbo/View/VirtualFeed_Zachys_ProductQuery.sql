@@ -1,6 +1,6 @@
 ﻿/****** Object:  View [dbo].[VirtualFeed_Zachys_ProductQuery]    Committed by VersionSQL https://www.versionsql.com ******/
 
-CREATE VIEW dbo.VirtualFeed_Zachys_ProductQuery
+CREATE VIEW [dbo].[VirtualFeed_Zachys_ProductQuery]
 AS
 SELECT      CASE WHEN i.UDF_BRAND_NAMES ='Arnot-Roberts' THEN 'Arnot Roberts'
 				WHEN i.UDF_BRAND_NAMES ='Red Car' THEN 'Red Car Wine Company'
@@ -107,7 +107,7 @@ SELECT      CASE WHEN i.UDF_BRAND_NAMES ='Arnot-Roberts' THEN 'Arnot Roberts'
 			, CASE WHEN len(i.UDF_GALLONI_REVIEW) > 0 or len(i.UDF_GALLONI_SCORE) > 0 THEN 'Vinous Media' ELSE '' END as [Critic Name 2]
 			, i.UDF_GALLONI_SCORE as [Critic Score 2]
 			, Replace(Replace(IsNull(i.UDF_GALLONI_REVIEW,''),char(13),''),char(10),'')as [Critic Notes 2]
-			, CASE WHEN len(i.ImageFile) > 0 THEN 'https://polaner-labels.s3.amazonaws.com/' + i.ImageFile ELSE '' END as [Bottle Image URL]
+			, CASE WHEN len(i.ImageFile) > 0 THEN 'https://labels.polanerselections.com/' + i.ImageFile ELSE '' END as [Bottle Image URL]
 FROM         MAS_POL.dbo.CI_Item i INNER JOIN
 					  dbo.VirtualFeed_Zachys_Items z ON i.ItemCode = z.ItemCode INNER JOIN
                       dbo.IM_ItemWarehouse_000 w ON i.ItemCode = w.ItemCode INNER JOIN
