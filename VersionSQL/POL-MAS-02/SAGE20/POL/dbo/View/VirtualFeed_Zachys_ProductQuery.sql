@@ -46,7 +46,12 @@ SELECT      CASE WHEN i.UDF_BRAND_NAMES ='Arnot-Roberts' THEN 'Arnot Roberts'
 			, Replace(Replace(i.UDF_UPC_CODE,'n/a',''), char(9),'') AS [UPC Code]
 			, Replace(i.UDF_BOTTLE_SIZE, ' ','') as [Size]
 			, Replace(i.STANDARDUNITOFMEASURE, 'C', '') AS [Pack Size]
-			, CASE WHEN CAST(ROUND(av.QuantityAvailable * IsNull(dbo.TryConvertUom(Replace(i.STANDARDUNITOFMEASURE, 'C', '')), 12),0) as INT) > 0 THEN CAST(ROUND(av.QuantityAvailable * IsNull(dbo.TryConvertUom(Replace(i.STANDARDUNITOFMEASURE, 'C', '')), 12),0) as INT) ELSE 1 END as [Qty in Bottles]
+			, CASE WHEN CAST(ROUND(av.QuantityAvailable * IsNull(dbo.TryConvertUom(Replace(i.STANDARDUNITOFMEASURE, 'C', '')), 12),0) as INT) > 0 AND
+						ven.UDF_VEND_INACTIVE <> 'Y' AND
+						i.CATEGORY1 ='Y' AND
+						i.StandardUnitCost > 0 AND
+						p.PriceCodeRecord=3
+					THEN CAST(ROUND(av.QuantityAvailable * IsNull(dbo.TryConvertUom(Replace(i.STANDARDUNITOFMEASURE, 'C', '')), 12),0) as INT) ELSE 1 END as [Qty in Bottles]
 			, FORMAT(p.DiscountMarkup1 / IsNull(dbo.TryConvertUom(Replace(i.STANDARDUNITOFMEASURE, 'C', '')), 12), 'N', 'en-US') as [Frontline Price]
 			, FORMAT(CASE WHEN Replace(p.ValidDateDescription_234, ' ','') NOT LIKE '%12B%' THEN p.DiscountMarkup1 / IsNull(dbo.TryConvertUom(Replace(i.STANDARDUNITOFMEASURE, 'C', '')), 12)
 				ELSE SUBSTRING(Replace(p.ValidDateDescription_234, ' ',''), CHARINDEX('12B', Replace(p.ValidDateDescription_234, ' ','')) - 3,2) END, 'N', 'en-US') AS [One Case Price]
@@ -117,8 +122,4 @@ FROM         MAS_POL.dbo.CI_Item i INNER JOIN
 					  MAS_POL.dbo.CI_UDT_VARIETALS var ON i.UDF_VARIETALS_T = var.UDF_VARIETAL_CODE LEFT OUTER JOIN
 					  MAS_POL.dbo.CI_UDT_PRIMARY_REGION reg ON i.UDF_REGION = reg.UDF_PRIMARY_REGION_CODE LEFT OUTER JOIN
 					  MAS_POL.dbo.CI_UDT_APPELLATION app ON i.UDF_SUBREGION_T = app.UDF_APPELLATION
-WHERE		ven.UDF_VEND_INACTIVE <> 'Y' AND
-			i.CATEGORY1 ='Y' AND
-			i.StandardUnitCost > 0 AND
-			p.PriceCodeRecord=3 AND
-			p.CustomerPriceLevel = 'Y'
+WHERE		p.CustomerPriceLevel = 'Y'
