@@ -17,7 +17,9 @@ DiscountMarkup4,
 DiscountMarkup5,
 ValidDate_234,
 ValidDateDescription_234,
-PriceCodeRecord
+PriceCodeRecord,
+ARDivisionNo,
+CustomerNo
 FROM         MAS_POL.dbo.IM_PriceCode
 
 
